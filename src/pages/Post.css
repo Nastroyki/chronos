@@ -1,0 +1,58 @@
+.header {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.title-publish {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.edit {
+    padding-top: 10px;
+    padding-right: 10px;
+}
+
+.add-data {
+    text-align: right;
+}
+
+.rate-post {
+    text-align: center;
+    border-right: 1px solid;
+    border-color: white;
+}
+
+.content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.title-publish-elem {
+    padding-top: 20px;
+    text-align: center;
+    border-bottom: 1px solid;
+    text-align: start;
+}
+
+.title-publish-content {
+    text-align: left;
+}
+
+.status-rate-elem {
+    padding-bottom: 15px;
+    padding-left: 15px;
+    text-align: center;
+    padding-right: 20px;
+    border-right: 1px solid;
+    border-color: white;
+}
+
+.status-rate {
+    padding-top: 10px;
+}
