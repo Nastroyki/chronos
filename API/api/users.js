@@ -11,10 +11,12 @@ import { errorHandler } from '../utils/errorHandler.js';
 import { generateResponse } from '../utils/responce.js';
 import { getUserFromRequest } from '../utils/tokenUtils.js';
 import { checkForForeignFields, checkForBannedFields, checkForMissedFields } from '../utils/checks.js';
+import { Calendar } from '../models/Calendar.js';
+import { User_Calendar } from '../models/User_Calendar.js';
 
 router.get('/', async (req, res) => {
     const users = await User.findAll();
-    const simplifiedUsers = users.map(user => ({ id: user.id, username: user.username }));
+    const simplifiedUsers = users.map(user => ({ id: user.id, login: user.login }));
     return res.status(200).json(generateResponse('Users data', {data: simplifiedUsers}));
 });
 
@@ -29,10 +31,10 @@ router.post('/', errorHandler(async (req, res) => {
     await checkForBannedFields(["rating"], req.body)
     await checkForMissedFields(["login", "email", "password", "confirmPassword", "role"], req.body);
     const { login, email, password, confirmPassword, role } = req.body;
-    const existingUser = await User.findOne({ where: { [Op.or]: [ { username: login }, { email: email } ] } });
+    const existingUser = await User.findOne({ where: { [Op.or]: [ { login: login }, { email: email } ] } });
 
     if (existingUser) {
-        if (existingUser.username === login) throw 'User with this username already exists';
+        if (existingUser.username === login) throw 'User with this login already exists';
         else throw 'User with this email already exists';
     }
 
@@ -45,10 +47,9 @@ router.post('/', errorHandler(async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     await User.create({
-        username: login,
+        login: login,
         email,
         password: hashedPassword,
-        role
     });
 
     return res.status(200).json(generateResponse("User created successfully"));
@@ -60,15 +61,33 @@ router.get('/:user_id', async (req, res) => {
 
     if (!user) return res.status(400).json(generateResponse('User not found', { type: 'error' }));
 
+    const userCalendars = await User_Calendar.findAll({
+        where: { user_id: userId }
+    });
+
+    const calendars = await user.getCalendars();
+
+    const formattedCalendars = calendars.map(calendar => {
+        const userCalendar = userCalendars.find(item => item.calendar_id === calendar.id);
+        const access = userCalendar ? userCalendar.access : null;
+
+        return {
+            id: calendar.id,
+            name: calendar.name,
+            author: calendar.author,
+            access: access
+        };
+    });
+
     return res.status(200).json(generateResponse('User found', { 
         data: { 
             id: user.id, 
-            username: user.username, 
+            login: user.login, 
             mail: user.email,
-            rating: user.rating,
+            calendars: formattedCalendars,
             createdAt: user.createdAt,
-            role: user.role
-        } }));
+        }
+    }));
 });
 
 router.get('/:user_id/:user_login.jpg', async (req, res) => {
@@ -85,7 +104,8 @@ router.delete('/:user_id', errorHandler(async (req, res) => {
     const cur_user = await User.findByPk(users[cur_userId]);
     const userId = req.params.user_id;
 
-    if (cur_user.role !== "Admin" && cur_user.id !== userId) throw 'Permission denied';
+    // if (cur_user.role !== "Admin" && cur_user.id !== userId) throw 'Permission denied';
+    if (cur_user.id != userId) throw 'Permission denied';
     
     const user = await User.findByPk(userId);
 
@@ -95,25 +115,26 @@ router.delete('/:user_id', errorHandler(async (req, res) => {
     return res.status(200).json(generateResponse('User successfully deleted'));
 }));
 
-router.patch('/:user_id', errorHandler(async (req, res) => {
-    const cur_userId = await getUserFromRequest(req);
-    const users = getAuthUsers();
-    const cur_user = await User.findByPk(users[cur_userId]);
-    const userId = req.params.user_id;
+// router.patch('/:user_id', errorHandler(async (req, res) => {
+//     const cur_userId = await getUserFromRequest(req);
+//     const users = getAuthUsers();
+//     const cur_user = await User.findByPk(users[cur_userId]);
+//     const userId = req.params.user_id;
 
-    if (cur_user.role != "Admin" && cur_user.id != userId) throw 'Permission denied';
+//     // if (cur_user.role != "Admin" && cur_user.id != userId) throw 'Permission denied';
+//     if (cur_user.id != userId) throw 'Permission denied';
     
-    const user = await User.findByPk(userId);
+//     const user = await User.findByPk(userId);
 
-    if (!user) throw 'User not found';
+//     if (!user) throw 'User not found';
 
-    await checkForForeignFields(user.toJSON(), req.body);
+//     await checkForForeignFields(user.toJSON(), req.body);
 
-    if (cur_user.role != "Admin") await checkForBannedFields(["role", "password", "rating"], req.body);
-    else await checkForBannedFields(["rating"], req.body);
+//     if (cur_user.role != "Admin") await checkForBannedFields(["role", "password", "rating"], req.body);
+//     else await checkForBannedFields(["rating"], req.body);
 
-    await user.update(req.body);
-    return res.status(200).json(generateResponse('User successfully modified'));
-}));
+//     await user.update(req.body);
+//     return res.status(200).json(generateResponse('User successfully modified'));
+// }));
 
 export default router;

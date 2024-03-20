@@ -8,7 +8,7 @@ const secretKey = 'caf6dc3d3ca9f8ddfb677032d6c600509332d20aad5d42a46e61a88199be1
 const createToken = (existingUser) => {
 	let code = crypto.randomBytes(16).toString('hex');
 	addToAuthUsers({code: code, id: existingUser.id});
-	const token = jwt.sign({ user_id: code, id: existingUser.id, username: existingUser.username, role: existingUser.role, rating: existingUser.rating}, secretKey, { expiresIn: '1d' });
+	const token = jwt.sign({ user_id: code, id: existingUser.id, username: existingUser.login}, secretKey, { expiresIn: '1d' });
 	return token;
 }
 

@@ -1,15 +1,15 @@
 import express from 'express';
 const router = express.Router();
 import { Op } from 'sequelize';
-import { User } from '../models/User.js';
-import { Category } from '../models/Category.js';
+import { User } from '../../models/User.js';
+import { Category } from '../../models/Category.js';
 import { Post } from '../models/Post.js';
 
-import { getAuthUsers } from '../utils/authUsers.js';
-import { getUserFromRequest } from '../utils/tokenUtils.js';
-import { generateResponse } from '../utils/responce.js';
-import { errorHandler } from '../utils/errorHandler.js';
-import { checkForMissedFields, checkForBannedFields, checkForForeignFields } from '../utils/checks.js';
+import { getAuthUsers } from '../../utils/authUsers.js';
+import { getUserFromRequest } from '../../utils/tokenUtils.js';
+import { generateResponse } from '../../utils/responce.js';
+import { errorHandler } from '../../utils/errorHandler.js';
+import { checkForMissedFields, checkForBannedFields, checkForForeignFields } from '../../utils/checks.js';
 
 router.get('/', async (req, res) => {
     const categories = await Category.findAll();

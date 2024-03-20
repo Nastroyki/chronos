@@ -1,17 +1,17 @@
 import express from 'express';
 const router = express.Router();
 
-import { User } from '../models/User.js';
+import { User } from '../../models/User.js';
 import { Post } from '../models/Post.js';
 import { Like } from '../models/Like.js';
 import { Comment } from '../models/Comment.js';
-import { Category } from '../models/Category.js';
+import { Category } from '../../models/Category.js';
 
-import { getAuthUsers } from '../utils/authUsers.js';
-import { generateResponse } from '../utils/responce.js';
-import { errorHandler } from '../utils/errorHandler.js';
-import { getUserFromRequest } from '../utils/tokenUtils.js';
-import { checkForMissedFields, checkForBannedFields, checkForForeignFields } from '../utils/checks.js';
+import { getAuthUsers } from '../../utils/authUsers.js';
+import { generateResponse } from '../../utils/responce.js';
+import { errorHandler } from '../../utils/errorHandler.js';
+import { getUserFromRequest } from '../../utils/tokenUtils.js';
+import { checkForMissedFields, checkForBannedFields, checkForForeignFields } from '../../utils/checks.js';
 
 router.get('/:post_id', errorHandler(async (req, res) => {
     console.log("asdasdasd");

@@ -4,12 +4,12 @@ import sequelize from '../utils/db.js';
 const User_Calendar = sequelize.define('User_Calendar', {
     access: {
       type: DataTypes.ENUM('write', 'read'),
-      allowNull: false
-    },
-    hide: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
+      defaultValue: 'read'
     }
+    // hide: {
+    //   type: DataTypes.BOOLEAN,
+    //   defaultValue: true
+    // }
 });
 
 export { User_Calendar };

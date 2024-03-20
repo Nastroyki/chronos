@@ -3,6 +3,8 @@ const router = express.Router();
 import bcrypt from 'bcrypt';
 import { Op } from 'sequelize';
 import { User } from '../models/User.js';
+import { Calendar } from '../models/Calendar.js';
+import { User_Calendar } from '../models/User_Calendar.js';
 
 import schema from '../utils/passwordSchema.js';
 import { deleteAuthUser } from '../utils/authUsers.js';
@@ -14,7 +16,7 @@ import { createToken, getUserFromRequest } from '../utils/tokenUtils.js';
 router.post('/login', errorHandler(async (req, res) => {
 	await checkForMissedFields(["login", "password"], req.body);
     const { login, password } = req.body;
-    const existingUser = await User.findOne({ where: { username: login } });
+    const existingUser = await User.findOne({ where: { login: login } });
 
     if (!existingUser) throw 'User does not exist';
 
@@ -28,9 +30,9 @@ router.post('/register', errorHandler(async (req, res) => {
 	await checkForMissedFields(["login", "email", "password", "confirmPassword"], req.body);
 	const { login, email, password, confirmPassword } = req.body;
 
-	const existingUser = await User.findOne({ where: { [Op.or]: [ { username: login }, { email: email } ] } });
+	const existingUser = await User.findOne({ where: { [Op.or]: [ { login: login }, { email: email } ] } });
 	if (existingUser) {
-		if (existingUser.username === login) throw 'User with this username already exists';
+		if (existingUser.login === login) throw 'User with this username already exists';
 		else throw 'User with this email already exists';
 	}
 
@@ -43,9 +45,20 @@ router.post('/register', errorHandler(async (req, res) => {
 	const hashedPassword = await bcrypt.hash(password, saltRounds);
 
 	const newUser = await User.create({
-		username: login,
+		login: login,
 		email,
 		password: hashedPassword
+	});
+
+	const newCalendar = await Calendar.create({
+		author_id: newUser.id,
+		name: 'default'
+	});
+
+	await User_Calendar.create({
+		user_id: newUser.id,
+		calendar_id: newCalendar.id,
+		access: 'write'
 	});
 
 	return res.status(201).json(generateResponse('You have successfully registered'));

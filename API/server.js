@@ -2,9 +2,11 @@ import express          from 'express';
 import sequelize        from './utils/db.js';
 import authRoutes       from './api/auth.js';
 import usersRoutes      from './api/users.js';
-import PostsRoutes      from './api/posts.js';
-import CommentsRoutes   from './api/comments.js';
-import categoriesRoutes from './api/categories.js';
+import calendarRoutes   from './api/calendars.js'         
+
+// import PostsRoutes      from './api/posts.js';
+// import CommentsRoutes   from './api/comments.js';
+// import categoriesRoutes from './api/categories.js';
 
 import { defineAssociations } from './utils/associations.js';
 
@@ -20,9 +22,11 @@ app.use(express.json());
 app.use(cors());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
-app.use('/api/categories', categoriesRoutes);
-app.use('/api/posts', PostsRoutes);
-app.use('/api/comments', CommentsRoutes);
+app.use('/api/calendars', calendarRoutes);
+// app.use('/api/categories', categoriesRoutes);
+// app.use('/api/posts', PostsRoutes);
+// app.use('/api/comments', CommentsRoutes);
+
 
 // import bcrypt from 'bcrypt';
 // const saltRounds = 10;
