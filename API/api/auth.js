@@ -65,8 +65,13 @@ router.post('/register', errorHandler(async (req, res) => {
 }));
 
 router.post('/logout', errorHandler(async (req, res) => {
-	const userId = await getUserFromRequest(req);
-	deleteAuthUser(userId);
+	try {
+		const userId = await getUserFromRequest(req);
+		deleteAuthUser(userId);
+	}
+	catch (error) {
+		return res.status(201).json(generateResponse('You are not logged in'));
+	}
 	return res.status(201).json(generateResponse('You logged out successfully'));
 }));
 

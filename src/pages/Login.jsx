@@ -21,12 +21,10 @@ const Login = () => {
             const data = jwtDecode(response.data.data.token);
             login({
                 id: data.id,
-                username: data.username,
-                role: data.username,
-                rating: data.rating,
+                login: data.login,
                 token: response.data.data.token
             });
-            navigate("/");
+            navigate("/calendars");
             window.location.reload();
         }
         catch (error) {

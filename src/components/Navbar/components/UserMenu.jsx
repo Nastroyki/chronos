@@ -7,6 +7,7 @@ import { getUserFromLocalStorage } from "../../../store/store";
 
 const UserMenu = () => {
     const user = getUserFromLocalStorage();
+    console.log(user);
 
     const handleClick_log_out = async () => {
         await AuthService.logout();
@@ -44,9 +45,8 @@ const UserMenu = () => {
             }}>
                 <Container>
                     <Link style={{ textDecoration: 'none'}} to={`/user/${user.id}`}>   
-                        <Typography variant="body1" color="textPrimary">{user.username}</Typography>
+                        <Typography variant="body1" color="textPrimary">{user.login}</Typography>
                     </Link>
-                    <Typography variant="body1" color="textSecondary">{"rating: " + user.rating}</Typography>
                 </Container>
                 <Link onClick={handleClick_log_out} style={{ textDecoration: 'none', display: 'flex'}} to="/">
                     <Typography variant="body1" color="textPrimary">Log Out</Typography>

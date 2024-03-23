@@ -13,7 +13,7 @@ const PostsList = (props) => {
                     />
                 ))
             ) : (
-                <Typography variant="h3" align="center" color="colorSecondary">There are no posts</Typography>
+                <Typography variant="h3" align="center" color="colorSecondary" marginTop={"80px"}>There are no calendars</Typography>
             )}
         </Container>
     );

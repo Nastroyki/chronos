@@ -22,7 +22,7 @@ const Navbar = () => {
           }}
           className="nav_bar">
             <Link style={{ textDecoration: 'none'}} to="/">
-                <Typography variant="h5" color="textPrimary">WTCD?</Typography>
+                <Typography variant="h5" color="textPrimary">Glass</Typography>
             </Link>
             <StatusMenu sx={{ flexGrow: 1, marginLeft: "auto" }}/>
         </Box>
