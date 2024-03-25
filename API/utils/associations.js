@@ -16,7 +16,7 @@ export function defineAssociations() {
 
   // for Event
   Event.belongsTo(Calendar, { foreignKey: 'calendar_id' });
-  Event.hasMany(Category, { foreignKey: 'event_id' });
+  Event.hasOne(Category, { foreignKey: 'event_id' });
 
   // for Category
   Category.belongsTo(Event, { foreignKey: 'event_id' });

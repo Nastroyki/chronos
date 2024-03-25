@@ -2,11 +2,11 @@ import { DataTypes } from 'sequelize';
 import sequelize from '../utils/db.js';
 
 const Category = sequelize.define('Category', {
-    time: {
+    startTime: {
         type: DataTypes.TIME,
         defaultValue: null
     },
-    length: {
+    duration: {
         type: DataTypes.TIME,
         defaultValue: null
     },

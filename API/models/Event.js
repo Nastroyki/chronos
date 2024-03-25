@@ -9,10 +9,6 @@ const Event = sequelize.define('Event', {
     name: {
         type: DataTypes.STRING,
         allowNull: false
-    },
-    description: {
-        type: DataTypes.STRING,
-        defaultValue: ""
     }
 });
 
