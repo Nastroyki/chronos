@@ -1,0 +1,14 @@
+.sidebar {
+    height: 100%;
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: -250px; /* Начальное положение за пределами экрана */
+    background-color: #111;
+    padding-top: 20px;
+    transition: left 0.2s ease; /* Плавное анимирование */
+}
+
+.sidebar.open {
+    left: 0; /* Показываем боковую панель при открытии */
+}

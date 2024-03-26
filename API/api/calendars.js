@@ -88,6 +88,7 @@ const getDateSliceByType = (curDay, type) => {
 router.get('/:calendar_id', errorHandler(async (req, res) => {
     const calendarId = req.params.calendar_id
     const calendar = await Calendar.findByPk(calendarId);
+    console.log(req);
     if (!calendar) throw 'Calendar not found';
     
     if (!calendar.public) {
@@ -105,10 +106,8 @@ router.get('/:calendar_id', errorHandler(async (req, res) => {
         if (!user_access) throw 'Permition denied';
     }
     
-    await checkForMissedFields(["day", "type"], req.body);
-    const dateSlice = getDateSliceByType(req.body.day, req.body.type);
-
-    console.log(dateSlice);
+    await checkForMissedFields(["day", "type"], req.query);
+    const dateSlice = getDateSliceByType(req.query.day, req.query.type);
 
     const events_data = await Event.findAll({
         where: {
@@ -121,6 +120,7 @@ router.get('/:calendar_id', errorHandler(async (req, res) => {
 
     return res.status(200).json(generateResponse('Event data', {
         data: {
+            calendarName: calendar.name,
             Events: events_data.map(event => ({ id: event.id, name: event.name, day: (new Date(event.day).getDate())}))
         }
     }));

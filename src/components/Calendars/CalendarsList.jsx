@@ -5,7 +5,7 @@ import CalendarItem from "./CalendarItem";
 const CalendarsList = (props) => {
     console.log(props.calendars);
     return (
-        <Container sx={{ mt: 3, marginTop: "90px"}}>
+        <Container sx={{ marginTop: "80px"}}>
             {((props.calendars.calendars) && (props.calendars.calendars.length)) ? (
                 props.calendars.calendars.map((calendar) => (
                     <CalendarItem

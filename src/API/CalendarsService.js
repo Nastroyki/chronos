@@ -17,6 +17,25 @@ export default class CalendarsService {
         }
     }
 
+    static async getcalendarData(id, day, type) {
+        try {
+            const response = await axios.get(`http://localhost:3001/api/calendars/${id}`, {
+                params: {
+                    day: day,
+                    type: type
+                },
+                headers: {
+                    'Authorization': `Bearer ${getUserFromLocalStorage().token}`
+                }
+            });
+            const calendar = response.data.data;
+            return calendar;
+        }
+        catch (error) {
+            return [];
+        }
+    }
+
     // static async getCalendarById(id) {
     //     try {
     //         const response = await axios.get(`http://localhost:3001/api/calendars/${id}`);

@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Paper, Typography, Container, Box, Fab, colors } from "@mui/material";
+import { IconButton, Paper, Typography, Container, Box, Fab, colors } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
 import { getUserFromLocalStorage, logout } from "../store/store";
 import CalendarService from "../API/CalendarsService";
 import { DateCalendar } from '@mui/x-date-pickers';
 import dayjs from "dayjs";
 import "./Calendar.css";
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import { Directions } from "@mui/icons-material";
 
 const Calendar = () => {
     // Array to hold the days of the week
@@ -13,6 +16,39 @@ const Calendar = () => {
     const daysInMonthF = (year, month) => new Date(year, month + 1, 0).getDate();
     const year = new Date().getFullYear(); // to delete
     const month = new Date().getMonth(); // to delete
+
+    const [calendarData, setCalendarData] = useState([]);
+    const [day, setday] = useState(new Date());
+    const [showType, setType] = useState("month");
+    const { id } = useParams();
+
+    const getCalendarData = () => {
+        const year = day.getFullYear();
+        const month = String(day.getMonth() + 1).padStart(2, '0');
+        const day_ = String(day.getDate()).padStart(2, '0');
+        CalendarService.getcalendarData(id, `${year}-${month}-${day_}`, showType).then(async (res) => {
+            setCalendarData(res);
+            console.log(res);
+        });
+    }
+    
+    useEffect(() => {
+        getCalendarData();
+    }, [day, id, showType])
+
+
+    const onMoveClicked = (direction) => {
+        const newDate = new Date(day);
+        if (direction == "prev") {
+            newDate.setMonth(newDate.getMonth() - 1);
+        }
+        else {
+            newDate.setMonth(newDate.getMonth() + 1);
+        }
+        setday(newDate);
+    }
+
+
 
     // Function to generate calendar grid
     const generateCalendarGrid = () => {
@@ -60,15 +96,26 @@ const Calendar = () => {
     };
 
     return (
-        <div className="calendar">
-            <div className="header">
-                {/* Render day names */}
-                {daysOfWeek.map(day => (
-                    <div className="cell" key={day}>{day}</div>
-                ))}
+        <div className="calendarControll">
+            <div className="calendarControllPanel">
+                <IconButton onClick={() => onMoveClicked("prev")} aria-label="Example">
+                    <NavigateBeforeIcon/>
+                </IconButton>
+                <Typography variant="h5" color="textPrimary" textAlign="center">{calendarData.calendarName}</Typography>
+                <IconButton onClick={() => onMoveClicked("next")} aria-label="Example">
+                    <NavigateNextIcon/>
+                </IconButton>
             </div>
-            {/* Render calendar grid */}
-            {generateCalendarGrid()}
+            <div className="calendar">
+                <div className="header">
+                    {/* Render day names */}
+                    {daysOfWeek.map(day => (
+                        <div className="cell" key={day}>{day}</div>
+                    ))}
+                </div>
+                {/* Render calendar grid */}
+                {generateCalendarGrid()}
+            </div>
         </div>
     );
 };

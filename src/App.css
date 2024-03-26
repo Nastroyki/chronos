@@ -1,0 +1,7 @@
+.main-content {
+    transition: margin-left 0.2s ease; /* Плавное анимирование */
+}
+
+.main-content.open {
+    margin-left: 250px; /* Увеличиваем отступ при открытии боковой панели */
+}

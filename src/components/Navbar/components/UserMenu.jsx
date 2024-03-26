@@ -10,7 +10,7 @@ const UserMenu = () => {
     console.log(user);
 
     const handleClick_log_out = async () => {
-        await AuthService.logout();
+        // await AuthService.logout();
         logout();
         window.location.reload();
     };
@@ -20,8 +20,8 @@ const UserMenu = () => {
         <React.Fragment>
             <Paper sx={{
                 p: 1,
-                marginLeft: 2,
-                marginRight: 2,
+                marginLeft: 0,
+                marginRight: 0,
                 typography: 'body1',
                 borderRadius: 3,
                 width: "fit-content",
@@ -44,11 +44,9 @@ const UserMenu = () => {
                 },
             }}>
                 <Container>
-                    <Link style={{ textDecoration: 'none'}} to={`/user/${user.id}`}>   
-                        <Typography variant="body1" color="textPrimary">{user.login}</Typography>
-                    </Link>
+                    <Typography variant="body1" textAlign="center" color="textPrimary">{user.login}</Typography>
                 </Container>
-                <Link onClick={handleClick_log_out} style={{ textDecoration: 'none', display: 'flex'}} to="/">
+                <Link onClick={handleClick_log_out} style={{ textDecoration: 'none'}} to="/">
                     <Typography variant="body1" color="textPrimary">Log Out</Typography>
                 </Link>
             </Paper>

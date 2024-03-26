@@ -3,13 +3,23 @@
     flex-direction: column;
     border: 1px solid #ccc;
     width: 100%;
-    margin-top: 100px;
 }
 
 .header, .row {
     display: flex;
     flex-direction: row;
     border-bottom: 1px solid #ccc;
+}
+
+.calendarControll {
+    margin-top: 100px;
+    flex-direction: column;
+}
+
+.calendarControllPanel {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 2px;
 }
 
 .cell {

@@ -92,6 +92,7 @@ router.get('/:event_id', errorHandler(async (req, res) => {
         include: Category
     });
     if (!event) throw 'Event not found';
+    console.log(event);
 
     const calendar = await Calendar.findOne({
         where: {

@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import StatusMenu from "./components/StatusMenu";
 import { Link } from "react-router-dom";
+import CalendarsSideMenu from "../Calendars/CalendarsSideMenu";
 
-const Navbar = () => {
+const Navbar = ({ toggleSideMenu }) => {
     return (
         <Box sx={{
             display: "flex",
@@ -21,8 +22,8 @@ const Navbar = () => {
             p: "10px",
           }}
           className="nav_bar">
-            <Link style={{ textDecoration: 'none'}} to="/">
-                <Typography variant="h5" color="textPrimary">Glass</Typography>
+            <Link style={{ textDecoration: 'none'}} onClick={toggleSideMenu}>
+                <Typography variant="h5" color="textPrimary">Menu</Typography>
             </Link>
             <StatusMenu sx={{ flexGrow: 1, marginLeft: "auto" }}/>
         </Box>
