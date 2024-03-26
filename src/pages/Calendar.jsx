@@ -9,18 +9,28 @@ import "./Calendar.css";
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { Directions } from "@mui/icons-material";
+import DayMenu from "../components/Calendars/DayMenu";
 
 const Calendar = () => {
     // Array to hold the days of the week
     const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const daysInMonthF = (year, month) => new Date(year, month + 1, 0).getDate();
-    const year = new Date().getFullYear(); // to delete
-    const month = new Date().getMonth(); // to delete
 
     const [calendarData, setCalendarData] = useState([]);
     const [day, setday] = useState(new Date());
     const [showType, setType] = useState("month");
     const { id } = useParams();
+
+    const year = day.getFullYear();
+    const month = day.getMonth();
+
+    const [chosenDate, setChosenDate] = useState(new Date());
+    const [showForm, setShowForm] = useState(false);
+
+    const cellClick = (e) => {
+        setChosenDate(new Date(year, month, e.target.innerHTML));
+        setShowForm(true);
+    }
 
     const getCalendarData = () => {
         const year = day.getFullYear();
@@ -57,9 +67,6 @@ const Calendar = () => {
         let dayofWeek = new Date(year, month, 1).getDay() - 1;
         let daysInMonth = daysInMonthF(year, month);
         let daysInPreviousMonth = daysInMonthF(year, month - 1);
-        console.log(dayofWeek);
-        console.log(daysInMonth);
-        console.log(daysInPreviousMonth);
         let prewiousMonth = true;
         // Loop through each row
         for (let i = 0; i < 6; i++) {
@@ -72,7 +79,7 @@ const Calendar = () => {
 
                 if (prewiousMonth) {
                     const dayNumber = daysInPreviousMonth - dayofWeek + j + 1;
-                    cells.push(<div className="cell" key={dayNumber} style={{color: "gray"}}>{dayNumber}</div>);
+                    cells.push(<div className="graycell" key={dayNumber} style={{ color: "gray" }}>{dayNumber}</div>);
                     continue;
                 }
                 // Calculate day number
@@ -80,14 +87,14 @@ const Calendar = () => {
 
                 if (dayNumber > daysInMonth) {
                     dayNumber = dayNumber - daysInMonth;
-                    cells.push(<div className="cell" key={dayNumber} style={{color: "gray"}}>{dayNumber}</div>);
+                    cells.push(<div className="graycell" key={dayNumber} style={{ color: "gray" }}>{dayNumber}</div>);
                     continue;
                 }
                 if (dayNumber === today) {
-                    cells.push(<div className="cell" key={dayNumber} style={{backgroundColor: "gray"}}>{dayNumber}</div>);
+                    cells.push(<div className="todaycell" key={dayNumber} onClick={(e) => cellClick(e)} >{dayNumber}</div>);
                     continue;
                 }
-                cells.push(<div className="cell" key={dayNumber}>{dayNumber}</div>);
+                cells.push(<div className="cell" key={dayNumber} onClick={(e) => cellClick(e)}>{dayNumber}</div>);
             }
             // Push each row into the rows array
             rows.push(<div className="row" key={i}>{cells}</div>);
@@ -115,6 +122,7 @@ const Calendar = () => {
                 </div>
                 {/* Render calendar grid */}
                 {generateCalendarGrid()}
+                <DayMenu chosenDate={chosenDate} showForm={showForm} setShowForm={setShowForm}/>
             </div>
         </div>
     );

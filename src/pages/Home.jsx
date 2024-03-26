@@ -4,7 +4,7 @@ import { getUserFromLocalStorage } from "../store/store";
 
 const Home = () => {
     if (getUserFromLocalStorage()) {
-        window.location.href = "/calendars/1";
+        window.location.href = "/calendars/";
     }
 
     return (

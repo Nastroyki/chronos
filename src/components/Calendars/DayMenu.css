@@ -1,0 +1,51 @@
+.daymenu {
+    width: min(100% - 40px, 600px);
+}
+
+.eventscontainer {
+    height: min(calc(60vh - 100px), 400px);
+    width: 100%;
+    overflow-y: scroll;
+    margin: 20px;
+    position: relative;
+}
+
+.eventrow {
+    height: 48px;
+}
+
+.eventtime {
+    width: 100px;
+    border-right: 1px solid #ccc;
+    padding-right: 5px;
+    padding-top: 0px;
+}
+.timeString {
+    margin-top: 0px;
+    text-align: end;
+}
+
+.eventcell {
+    border: 1px solid #ccc;
+    padding: 0px;
+}
+
+#timetable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+
+.event {
+    position: absolute;
+    margin-left: 100px;
+}
+.eventbox {
+    background-color: blueviolet;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    margin: 5px;
+    height: 100%;
+}
