@@ -1,12 +1,30 @@
 .calendarControll {
     margin-top: 100px;
     flex-direction: column;
+    margin-right: auto;
+    margin-left: auto;
+    margin-bottom: 10px;
+    max-width: calc(calc(120px * 7));
+}
+
+.month-weekselect {
+    position: absolute;
+    right: 0;
+    display: flex;
+    align-items: center;
+    text-align: center;
+}
+
+.arrow {
+    height: 35px;
+    width: 35px;
 }
 
 .calendarControllPanel {
     display: flex;
-    flex-direction: row;
-    margin-bottom: 2px;
+    position: relative;
+    width: 100%;
+    height: 35px;
 }
 
 .calendar {
@@ -14,6 +32,7 @@
     flex-direction: column;
     border: 1px solid #ccc;
     width: 100%;
+    border-right: transparent;
 }
 
 .header, .row {
@@ -22,18 +41,28 @@
     border-bottom: 1px solid #ccc;
 }
 
-.cell, .todaycell, .graycell {
+.cell, .todaycell, .graycell, .cellhead {
     flex: 1;
-    padding: 10px;
+    padding-right: 4px;
     /* height: calc(100vw / 14); */
     height: calc(calc(100vh / 7) - 20px);
-    text-align: center;
+    text-align: right;
     border-right: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
+    min-height: 70px;
+    max-width: 120px;
 }
 .todaycell {
     background-color: #b0b0b0;
 }
+
+.cellhead {
+    text-align: center;
+    padding: 10px;
+    height: 40px;
+    min-height: 40px;
+}
+
 
 .cell:hover, .todaycell:hover {
     background-color: #6a6a6a;

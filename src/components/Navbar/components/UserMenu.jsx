@@ -10,9 +10,10 @@ const UserMenu = () => {
     console.log(user);
 
     const handleClick_log_out = async () => {
-        // await AuthService.logout();
-        logout();
-        window.location.reload();
+        await AuthService.logout().then(() => {
+            logout();
+            window.location.reload();
+        });
     };
 
 

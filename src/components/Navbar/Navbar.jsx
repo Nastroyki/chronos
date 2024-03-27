@@ -3,8 +3,14 @@ import { Box, Typography } from "@mui/material";
 import StatusMenu from "./components/StatusMenu";
 import { Link } from "react-router-dom";
 import CalendarsSideMenu from "../Calendars/CalendarsSideMenu";
+import { getUserFromLocalStorage } from "../../store/store";
 
 const Navbar = ({ toggleSideMenu }) => {
+    const [user, setUser] = useState(getUserFromLocalStorage());
+    useEffect(() => {
+        setUser(getUserFromLocalStorage());
+    }, []);
+
     return (
         <Box sx={{
             display: "flex",
@@ -22,9 +28,13 @@ const Navbar = ({ toggleSideMenu }) => {
             p: "10px",
           }}
           className="nav_bar">
-            <Link style={{ textDecoration: 'none'}} onClick={toggleSideMenu}>
-                <Typography variant="h5" color="textPrimary">Menu</Typography>
-            </Link>
+            {user ?
+                <Link style={{ textDecoration: 'none'}} onClick={toggleSideMenu}>
+                    <Typography variant="h5" color="textPrimary">Menu</Typography>
+                </Link>
+            :
+                <div></div>
+            }
             <StatusMenu sx={{ flexGrow: 1, marginLeft: "auto" }}/>
         </Box>
     )

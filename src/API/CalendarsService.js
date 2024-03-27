@@ -19,15 +19,27 @@ export default class CalendarsService {
 
     static async getcalendarData(id, day, type) {
         try {
-            const response = await axios.get(`http://localhost:3001/api/calendars/${id}`, {
-                params: {
-                    day: day,
-                    type: type
-                },
-                headers: {
-                    'Authorization': `Bearer ${getUserFromLocalStorage().token}`
-                }
-            });
+            const user = getUserFromLocalStorage();
+            let response;
+            if (user) {
+                response = await axios.get(`http://localhost:3001/api/calendars/${id}`, {
+                    params: {
+                        day: day,
+                        type: type
+                    },
+                    headers: {
+                        'Authorization': `Bearer ${getUserFromLocalStorage().token}`
+                    }
+                });
+            }
+            else {
+                response = await axios.get(`http://localhost:3001/api/calendars/${id}`, {
+                    params: {
+                        day: day,
+                        type: type
+                    }
+                });
+            }
             const calendar = response.data.data;
             return calendar;
         }

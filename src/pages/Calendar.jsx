@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import "./Calendar.css";
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { Directions } from "@mui/icons-material";
+import { Directions, TodayRounded } from "@mui/icons-material";
 import DayMenu from "../components/Calendars/DayMenu";
 
 const Calendar = () => {
@@ -37,8 +37,8 @@ const Calendar = () => {
         const month = String(day.getMonth() + 1).padStart(2, '0');
         const day_ = String(day.getDate()).padStart(2, '0');
         CalendarService.getcalendarData(id, `${year}-${month}-${day_}`, showType).then(async (res) => {
-            setCalendarData(res);
-            console.log(res);
+                setCalendarData(res);
+                console.log(res);
         });
     }
     
@@ -58,45 +58,43 @@ const Calendar = () => {
         setday(newDate);
     }
 
-
-
-    // Function to generate calendar grid
     const generateCalendarGrid = () => {
-        let rows = [];
-        let today = new Date().getDate();
-        let dayofWeek = new Date(year, month, 1).getDay() - 1;
-        let daysInMonth = daysInMonthF(year, month);
-        let daysInPreviousMonth = daysInMonthF(year, month - 1);
-        let prewiousMonth = true;
-        // Loop through each row
+        const rows = [];
+        const today = new Date();
+        const firstDayOfMonth = new Date(year, month, 1);
+        const lastDayOfMonth = new Date(year, month + 1, 0);
+        const daysInPreviousMonth = new Date(year, month, 0).getDate();
+        let currentDay = 1;
+    
         for (let i = 0; i < 6; i++) {
-            let cells = [];
-            // Loop through each day of the week (7 days)
+            const cells = [];
             for (let j = 0; j < 7; j++) {
-                if (dayofWeek === j) {
-                    prewiousMonth = false;
+                const dayNumber = (i * 7) + j + 1 - firstDayOfMonth.getDay();
+                const isCurrentMonth = dayNumber >= 1 && dayNumber <= lastDayOfMonth.getDate();
+                const cellClass = isCurrentMonth ? "cell" : "graycell";
+                const textColor = isCurrentMonth ? "white" : "gray";
+                const handleClick = isCurrentMonth ? cellClick : null;
+    
+                let displayDay = '';
+                if (dayNumber <= 0) {
+                    displayDay = daysInPreviousMonth + dayNumber;
+                } else if (dayNumber > lastDayOfMonth.getDate()) {
+                    displayDay = dayNumber - lastDayOfMonth.getDate();
+                } else {
+                    displayDay = dayNumber;
                 }
-
-                if (prewiousMonth) {
-                    const dayNumber = daysInPreviousMonth - dayofWeek + j + 1;
-                    cells.push(<div className="graycell" key={dayNumber} style={{ color: "gray" }}>{dayNumber}</div>);
-                    continue;
-                }
-                // Calculate day number
-                let dayNumber = (i * 7) + j - dayofWeek + 1;
-
-                if (dayNumber > daysInMonth) {
-                    dayNumber = dayNumber - daysInMonth;
-                    cells.push(<div className="graycell" key={dayNumber} style={{ color: "gray" }}>{dayNumber}</div>);
-                    continue;
-                }
-                if (dayNumber === today) {
-                    cells.push(<div className="todaycell" key={dayNumber} onClick={(e) => cellClick(e)} >{dayNumber}</div>);
-                    continue;
-                }
-                cells.push(<div className="cell" key={dayNumber} onClick={(e) => cellClick(e)}>{dayNumber}</div>);
+    
+                cells.push(
+                    <div
+                        className={(dayNumber === today.getDate() && today.getMonth() === month && today.getFullYear() === year) ? "todaycell" : cellClass}
+                        key={`${i}-${j}`}
+                        style={{ color: textColor }}
+                        onClick={handleClick}
+                    >
+                        {displayDay}
+                    </div>
+                );
             }
-            // Push each row into the rows array
             rows.push(<div className="row" key={i}>{cells}</div>);
         }
         return rows;
@@ -105,22 +103,25 @@ const Calendar = () => {
     return (
         <div className="calendarControll">
             <div className="calendarControllPanel">
-                <IconButton onClick={() => onMoveClicked("prev")} aria-label="Example">
-                    <NavigateBeforeIcon/>
-                </IconButton>
-                <Typography variant="h5" color="textPrimary" textAlign="center">{calendarData.calendarName}</Typography>
-                <IconButton onClick={() => onMoveClicked("next")} aria-label="Example">
-                    <NavigateNextIcon/>
-                </IconButton>
+                <div>
+                    <Typography variant="h5" color="textPrimary" textAlign="center" marginLeft="20px">{calendarData.calendarName}</Typography>
+                </div>
+                <div className="month-weekselect">
+                    <IconButton className="arrow" onClick={() => onMoveClicked("prev")} aria-label="Example">
+                        <NavigateBeforeIcon/>
+                    </IconButton>
+                    <Typography variant="h5" color="textPrimary" textAlign="center">{(day.toDateString()).split(' ')[1]}</Typography>
+                    <IconButton className="arrow" sx={{marginBottom: '5px'}} onClick={() => onMoveClicked("next")} aria-label="Example">
+                        <NavigateNextIcon/>
+                    </IconButton>
+                </div>
             </div>
             <div className="calendar">
                 <div className="header">
-                    {/* Render day names */}
                     {daysOfWeek.map(day => (
-                        <div className="cell" key={day}>{day}</div>
+                        <div className="cellhead" key={day}>{day}</div>
                     ))}
                 </div>
-                {/* Render calendar grid */}
                 {generateCalendarGrid()}
                 <DayMenu chosenDate={chosenDate} showForm={showForm} setShowForm={setShowForm}/>
             </div>

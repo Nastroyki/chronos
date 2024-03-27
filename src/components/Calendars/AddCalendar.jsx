@@ -15,7 +15,7 @@ const AddCalendar = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await CalendarService.createCalendar(name, public_);
+            const response = await CalendarService.createCalendar(name, !public_);
             window.location.reload();
         }
         catch (error) {
@@ -62,14 +62,14 @@ const AddCalendar = () => {
                             required
                         />
 
-                        <FormControlLabel control={<Checkbox checked={public_} onChange={(e) => setPublic(e.target.checked)} />} label="Public" />
+                        <FormControlLabel control={<Checkbox checked={public_} onChange={(e) => setPublic(e.target.checked)} />} label="Private" />
 
 
                         {error && <Alert severity="error">{error}</Alert>}
 
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <Button variant="contained" type="submit" style={{width: "49%"}}>
-                                Add
+                                Create
                             </Button>
                             <Button variant="contained" onClick={() => setShowForm(false)} style={{width: "49%"}}>
                                 Cancel

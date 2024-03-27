@@ -15,6 +15,10 @@ export const publicRoutes = [
     {
         path: "/",
         Component: Home
+    },
+    {
+        path: "/calendars/:id",
+        Component: Calendar
     }
 ]
 
