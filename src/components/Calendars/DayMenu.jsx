@@ -43,6 +43,10 @@ const DayMenu = (props) => {
     let events = [];
 
     const renderTable = () => {
+        let rows = document.getElementsByClassName("eventrow");
+        while (rows.length > 0) {
+            rows[0].remove();
+        }
         for (let i = 0; i < 24; i += 0.5) {
             let row = document.createElement("tr");
             let time = document.createElement("td");
@@ -66,6 +70,9 @@ const DayMenu = (props) => {
 
     const recursionEventsFit = (i) => {
         for (let j = i - 1; j >= 0; j--) {
+            if (events[j].day !== events[i].day) {
+                continue;
+            }
             if (events[j].eventStartTime.isBefore(events[i].eventEndTime) && events[j].eventEndTime.isAfter(events[i].eventStartTime)) {
                 if (events[j].neighbors < events[i].neighbors) {
                     events[j].neighbors = events[i].neighbors;
@@ -97,6 +104,7 @@ const DayMenu = (props) => {
     }
 
     const renderEvents = async () => {
+        
         await getEvents();
         let oldEvents = document.getElementsByClassName("event");
         while (oldEvents.length > 0) {
@@ -116,6 +124,7 @@ const DayMenu = (props) => {
             eventCell.className = "event";
             let eventduration = dayjs(event.duration, 'HH:mm:ss')
             let eventStartTime = dayjs(event.startTime, 'HH:mm:ss')
+            console.log(event.startTime);
             let eventHeight = dayjsHour(eventduration) * oneHourHeight;
             eventCell.style.height = eventHeight + "px";
             eventCell.style.top = dayjsHour(eventStartTime) * oneHourHeight + "px";
@@ -167,6 +176,9 @@ const DayMenu = (props) => {
             while (changed) {
                 changed = false;
                 for (let j = 0; j < i; j++) {
+                    if (events[j].day !== event.day) {
+                        continue;
+                    }
                     if (events[j].eventStartTime.isBefore(event.eventEndTime) && events[j].eventEndTime.isAfter(event.eventStartTime)) {
                         if (events[j].iam === minfree) {
                             minfree++;
@@ -178,6 +190,9 @@ const DayMenu = (props) => {
             event.iam = minfree;
             event.neighbors = minfree;
             for (let j = 0; j < i; j++) {
+                if (events[j].day !== event.day) {
+                    continue;
+                }
                 if (events[j].eventStartTime.isBefore(event.eventEndTime) && events[j].eventEndTime.isAfter(event.eventStartTime)) {
                     if (events[j].neighbors > event.neighbors) {
                         event.neighbors = events[j].neighbors;
@@ -195,7 +210,17 @@ const DayMenu = (props) => {
                 continue;
             }
             event.iam = event.iam - 1;
-            let eventCell = document.getElementsByClassName("event")[i];
+            let eventCells = document.getElementsByClassName("event");
+            let eventCell;
+            for (let j = 0; j < eventCells.length; j++) {
+                if (eventCells[j].key === events[i].id) {
+                    eventCell = eventCells[j];
+                    break;
+                }
+            }
+            if(!eventCell) {
+                continue;
+            }
             let width = "calc(" + (100 / event.neighbors) + "% - " + (timeoffset / event.neighbors) + "px)"
             eventCell.style.width = width;
             eventCell.style.left = "calc(" + (100 / event.neighbors * event.iam) + "% - " + (timeoffset / event.neighbors * event.iam) + "px)";
