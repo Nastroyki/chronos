@@ -8,6 +8,7 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from "dayjs";
 import "./DayMenu.css";
+import EventsService from "../../API/EventsService";
 
 const DayMenu = (props) => {
     const oneHourHeight = 96;
@@ -17,8 +18,8 @@ const DayMenu = (props) => {
 
     const [eventName, setEventName] = useState("");
     const [eventDescription, setEventDescription] = useState("");
-    const [eventStartTime, setEventStartTime] = useState();
-    const [eventEndTime, setEventEndTime] = useState();
+    const [eventStartTime, setEventStartTime] = useState(dayjs("00:00:00", 'HH:mm:ss'));
+    const [eventEndTime, setEventEndTime] = useState(dayjs("00:00:00", 'HH:mm:ss'));
     const [eventType, setEventType] = useState("");
     const [error, setError] = useState("");
 
@@ -124,6 +125,41 @@ const DayMenu = (props) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (eventEndTime.isBefore(eventStartTime)) {
+            setError("End time must be after start time");
+            return;
+        }
+        if (eventEndTime.isSame(eventStartTime)) {
+            setError("End time can't be the same as start time");
+            return;
+        }
+        let event = {
+            name: eventName,
+            description: eventDescription,
+            day: dayjs(props.chosenDate).format('YYYY-MM-DD'),
+            startTime: eventStartTime.format('HH:mm'),
+            duration: eventEndTime.subtract(eventStartTime.hour(), 'hour').subtract(eventStartTime.minute(), 'minute').format('HH:mm'),
+            event_category: "task"
+        };
+        try {
+            let response = await EventsService.createEvent(props.calendarid, event);
+            console.log(response);
+            setMenuEvents(false);
+            props.setShowForm(false);
+        } catch (error) {
+            setError(error.response.data.message);
+        }
+    }
+
+    const openCreateEvent = () => {
+        setMenuEvents(true);
+        setEventName("");
+        setEventDescription("");
+        console.log(eventStartTime);
+        setEventStartTime(dayjs("00:00:00", 'HH:mm:ss'));
+        setEventEndTime(dayjs("00:00:00", 'HH:mm:ss'));
+        setEventType("");
+        setError("");
     }
 
 
@@ -202,7 +238,7 @@ const DayMenu = (props) => {
                         style={{
                             display: menuEvents ? 'none' : 'block'
                         }}>
-                        <table id="timetable" onClick={() => setMenuEvents(true)}>
+                        <table id="timetable" onClick={() => openCreateEvent()}>
                         </table>
                     </div>
                     <div className="eventedit"
@@ -240,14 +276,16 @@ const DayMenu = (props) => {
                                 format="HH:mm"
                                 ampm={false}
                                 required
-                                onChange={(e) => setEventStartTime(e.target.value)}
+                                value={dayjs(eventStartTime)}
+                                onChange={(e) => setEventStartTime(e)}
                             />
                             <TimePicker
                                 label="End Time"
                                 format="HH:mm"
                                 ampm={false}
                                 required
-                                onChange={(e) => setEventEndTime(e.target.value)}
+                                value={dayjs(eventEndTime)}
+                                onChange={(e) => setEventEndTime(e)}
                             />
                             <TextField
                                 label="Event Type"
@@ -264,7 +302,10 @@ const DayMenu = (props) => {
                             </Button>
                         </form>
                     </div>
-                    <Fab color="error" aria-label="edit" sx={{ position: 'absolute', top: 26, right: 26, height: 44, width: 44 }} onClick={() => props.setShowForm(false)}>
+                    <Fab color="error" aria-label="edit" sx={{ position: 'absolute', top: 26, right: 26, height: 44, width: 44 }} onClick={() => {
+                        props.setShowForm(false)
+                        setMenuEvents(false)
+                    }}>
                         <CloseIcon />
                     </Fab>
                     <Fab color="success" aria-label="edit" sx={{ position: 'absolute', top: 26, left: 26, height: 44, width: 44, display: menuEvents ? '' : 'none' }} onClick={() => setMenuEvents(false)}>

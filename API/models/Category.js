@@ -15,7 +15,7 @@ const Category = sequelize.define('Category', {
         defaultValue: ""
     },
     event_category: {
-        type: DataTypes.ENUM('reminder', 'task', 'family', 'other'),
+        type: DataTypes.ENUM('arrangement', 'reminder', 'task', 'holiday', 'other'),
         allowNull: false
     },
     repeat: {

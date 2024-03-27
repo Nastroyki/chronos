@@ -52,6 +52,11 @@
     min-height: 70px;
     max-width: 120px;
 }
+
+.cell, .todaycell {
+    cursor: pointer;
+}
+
 .todaycell {
     background-color: #b0b0b0;
 }

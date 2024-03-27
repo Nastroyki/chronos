@@ -124,7 +124,7 @@ const Calendar = () => {
                             ))}
                         </div>
                         {generateCalendarGrid()}
-                        <DayMenu chosenDate={chosenDate} showForm={showForm} setShowForm={setShowForm}/>
+                        <DayMenu chosenDate={chosenDate} showForm={showForm} setShowForm={setShowForm} calendarid={id}/>
                     </div>
                 </div>
                 : 
