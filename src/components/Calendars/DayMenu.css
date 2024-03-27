@@ -2,12 +2,24 @@
     width: min(100% - 40px, 600px);
 }
 
+.eventPaper {
+    position: relative;
+}
+
+
 .eventscontainer {
-    height: min(calc(60vh - 100px), 400px);
+    height: calc(100vh - 250px);
     width: 100%;
     overflow-y: scroll;
+    scrollbar-color: gray #282828;
+    scrollbar-width: thin;
     margin: 20px;
     position: relative;
+}
+
+.eventedit {
+    height: calc(100vh - 250px);
+    margin: 20px;
 }
 
 .eventrow {
@@ -15,11 +27,12 @@
 }
 
 .eventtime {
-    width: 100px;
+    width: 50px;
     border-right: 1px solid #ccc;
     padding-right: 5px;
     padding-top: 0px;
 }
+
 .timeString {
     margin-top: 0px;
     text-align: end;
@@ -39,13 +52,14 @@
 
 .event {
     position: absolute;
-    margin-left: 100px;
+    margin-left: 50px;
 }
+
 .eventbox {
     background-color: blueviolet;
     color: white;
     padding: 5px;
     border-radius: 5px;
-    margin: 5px;
-    height: 100%;
+    margin: 3px;
+    height: calc(100% - 3px);
 }
