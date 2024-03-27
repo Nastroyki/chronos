@@ -11,4 +11,5 @@
 
 .sidebar.open {
     left: 0; /* Показываем боковую панель при открытии */
+    border-right: 1px solid #ddd;
 }

@@ -37,8 +37,8 @@ const Calendar = () => {
         const month = String(day.getMonth() + 1).padStart(2, '0');
         const day_ = String(day.getDate()).padStart(2, '0');
         CalendarService.getcalendarData(id, `${year}-${month}-${day_}`, showType).then(async (res) => {
-                setCalendarData(res);
-                console.log(res);
+            setCalendarData(res);
+            console.log(res);
         });
     }
     
@@ -64,7 +64,6 @@ const Calendar = () => {
         const firstDayOfMonth = new Date(year, month, 1);
         const lastDayOfMonth = new Date(year, month + 1, 0);
         const daysInPreviousMonth = new Date(year, month, 0).getDate();
-        let currentDay = 1;
     
         for (let i = 0; i < 6; i++) {
             const cells = [];
@@ -101,30 +100,38 @@ const Calendar = () => {
     };
 
     return (
-        <div className="calendarControll">
-            <div className="calendarControllPanel">
+        <div>
+            {calendarData.type !== 'error' ?
+                <div className="calendarControll">
+                    <div className="calendarControllPanel">
+                        <div>
+                            <Typography varant="h5" color="textPrimary" textAlign="center" marginLeft="20px">{calendarData.calendarName}</Typography>
+                        </div>
+                        <div className="month-weekselect">
+                            <IconButton className="arrow" onClick={() => onMoveClicked("prev")} aria-label="Example">
+                                <NavigateBeforeIcon/>
+                            </IconButton>
+                            <Typography variant="h5" color="textPrimary" textAlign="center">{(day.toDateString()).split(' ')[1]}</Typography>
+                            <IconButton className="arrow" onClick={() => onMoveClicked("next")} aria-label="Example">
+                                <NavigateNextIcon/>
+                            </IconButton>
+                        </div>
+                    </div>
+                    <div className="calendar">
+                        <div className="header">
+                            {daysOfWeek.map(day => (
+                                <div className="cellhead" key={day}>{day}</div>
+                            ))}
+                        </div>
+                        {generateCalendarGrid()}
+                        <DayMenu chosenDate={chosenDate} showForm={showForm} setShowForm={setShowForm}/>
+                    </div>
+                </div>
+                : 
                 <div>
-                    <Typography variant="h5" color="textPrimary" textAlign="center" marginLeft="20px">{calendarData.calendarName}</Typography>
+                    <Typography varant="h5" color="textPrimary" textAlign="center" marginTop="100px">{calendarData.message == "No token provided" ? "Access denied": calendarData.message}</Typography>
                 </div>
-                <div className="month-weekselect">
-                    <IconButton className="arrow" onClick={() => onMoveClicked("prev")} aria-label="Example">
-                        <NavigateBeforeIcon/>
-                    </IconButton>
-                    <Typography variant="h5" color="textPrimary" textAlign="center">{(day.toDateString()).split(' ')[1]}</Typography>
-                    <IconButton className="arrow" sx={{marginBottom: '5px'}} onClick={() => onMoveClicked("next")} aria-label="Example">
-                        <NavigateNextIcon/>
-                    </IconButton>
-                </div>
-            </div>
-            <div className="calendar">
-                <div className="header">
-                    {daysOfWeek.map(day => (
-                        <div className="cellhead" key={day}>{day}</div>
-                    ))}
-                </div>
-                {generateCalendarGrid()}
-                <DayMenu chosenDate={chosenDate} showForm={showForm} setShowForm={setShowForm}/>
-            </div>
+            }
         </div>
     );
 };

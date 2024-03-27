@@ -44,7 +44,8 @@ export default class CalendarsService {
             return calendar;
         }
         catch (error) {
-            return [];
+            console.log(error.response.data);
+            return error.response.data;
         }
     }
 

@@ -16,7 +16,6 @@ export default class AuthService {
                 'Authorization': `Bearer ${getUserFromLocalStorage().token}`
             }
         });
-        console.log(response);
         return response;
     }
 

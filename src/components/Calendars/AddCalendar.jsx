@@ -24,9 +24,24 @@ const AddCalendar = () => {
     }
     return (
         <div>
-            <Fab color="secondary" aria-label="edit" sx={{ position: 'fixed', bottom: 26, right: 26 }} onClick={() => setShowForm(true)}>
-                <AddIcon />
-            </Fab>
+            <Paper elevation={2} sx={
+                    { 
+                        display: "flex", 
+                        justifyContent: "center", 
+                        alignItems: 'center', 
+                        cursor: 'pointer', 
+                        mt: 10, 
+                        mb: 0.5,
+                        ml: "24px",
+                        mr: "24px",
+                        borderRadius: 2, 
+                        border: "hidden", 
+                        alignContent: "center" 
+                    }
+                } onClick={() => setShowForm(true)}>
+                <AddIcon/>
+            </Paper>
+
             <Container
                 component="main"
                 maxWidth="sm"
