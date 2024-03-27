@@ -63,3 +63,17 @@
     margin: 3px;
     height: calc(100% - 3px);
 }
+
+.typecircle {
+    border-radius: 20px;
+    
+    display: inline-block;
+    padding: 2px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.eventsee {
+    height: calc(100vh - 250px);
+    margin: 20px;
+}

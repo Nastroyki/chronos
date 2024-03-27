@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Paper, Typography, Container, Box, Fab, Alert, ButtonBase, TextField, Button, Checkbox, FormControlLabel } from "@mui/material";
+import { Paper, Typography, Container, Box, Fab, Alert, ButtonBase, TextField, Button, Checkbox, FormControlLabel, Select, MenuItem, InputLabel } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -9,12 +9,20 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from "dayjs";
 import "./DayMenu.css";
 import EventsService from "../../API/EventsService";
+import SwitchType from "./SwitchType";
 
 const DayMenu = (props) => {
     const oneHourHeight = 96;
     const timeoffset = 50;
+    const arrangementColor = "orange";
+    const reminderColor = "red";
+    const taskColor = "blue";
+    const holidayColor = "green";
+    const otherColor = "purple";
 
-    const [menuEvents, setMenuEvents] = useState(false);
+    const [menuEvents, setMenuEvents] = useState(true);
+    const [editEvent, setEditEvent] = useState(false);
+    const [seeEvent, setSeeEvent] = useState(false);
 
     const [eventName, setEventName] = useState("");
     const [eventDescription, setEventDescription] = useState("");
@@ -22,6 +30,17 @@ const DayMenu = (props) => {
     const [eventEndTime, setEventEndTime] = useState(dayjs("00:00:00", 'HH:mm:ss'));
     const [eventType, setEventType] = useState("");
     const [error, setError] = useState("");
+
+    const [seeEventName, setSeeEventName] = useState("");
+    const [seeEventDescription, setSeeEventDescription] = useState("");
+    const [seeEventStartTime, setSeeEventStartTime] = useState(dayjs("00:00:00", 'HH:mm:ss'));
+    const [seeEventEndTime, setSeeEventEndTime] = useState(dayjs("00:00:00", 'HH:mm:ss'));
+    const [seeEventType, setSeeEventType] = useState("");
+
+    const [eventtoedit, setEventToEdit] = useState(null);
+    const [mode, setMode] = useState("Add Event");
+
+    let events = [];
 
     const renderTable = () => {
         for (let i = 0; i < 24; i += 0.5) {
@@ -56,9 +75,43 @@ const DayMenu = (props) => {
         }
     }
 
-    const renderEvents = () => {
+    const getEvents = async () => {
+        console.log("getEvents");
+        if (!props.calendarData.Events) {
+            return;
+        }
+        let events_ = [...props.calendarData.Events];
+        if (!events_ || events_.length === 0) {
+            return;
+        }
+        for (let i = 0; i < events_.length; i++) {
+            let res = await EventsService.getEvent(events_[i].id);
+            console.log(res);
+            events_[i].day = res.day;
+            events_[i].startTime = res.startTime;
+            events_[i].duration = res.duration;
+            events_[i].description = res.description;
+            events_[i].eventCategory = res.eventCategory;
+        }
+        events = events_;
+    }
+
+    const renderEvents = async () => {
+        await getEvents();
+        let oldEvents = document.getElementsByClassName("event");
+        while (oldEvents.length > 0) {
+            oldEvents[0].remove();
+        }
+
+        if (!events || events.length === 0) {
+            return;
+        }
+
         for (let i = 0; i < events.length; i++) {
             let event = events[i];
+            if (dayjs(event.day).format('D') !== dayjs(props.chosenDate).format('D')) {
+                continue;
+            }
             let eventCell = document.createElement("div");
             eventCell.className = "event";
             let eventduration = dayjs(event.duration, 'HH:mm:ss')
@@ -78,6 +131,30 @@ const DayMenu = (props) => {
             let time = document.createElement("span");
             let endTime = dayjs(event.startTime, 'HH:mm:ss').add(eventduration.hour(), 'hour').add(eventduration.minute(), 'minute');
             time.innerHTML = eventStartTime.format('HH:mm') + " - " + endTime.format('HH:mm');
+            console.log(event.eventCategory);
+            switch (event.eventCategory) {
+                case "arrangement":
+                    box.style.backgroundColor = "orange";
+                    break;
+                case "reminder":
+                    box.style.backgroundColor = "red";
+                    break;
+                case "task":
+                    box.style.backgroundColor = "blue";
+                    break;
+                case "holiday":
+                    box.style.backgroundColor = "green";
+                    break;
+                case "other":
+                    box.style.backgroundColor = "purple";
+                    break;
+                default:
+                    box.style.backgroundColor = "grey";
+                    break;
+            }
+            box.key = event.id;
+            box.addEventListener("click", (e) => openEvent(e));
+
             box.appendChild(time);
 
             eventCell.appendChild(box);
@@ -113,8 +190,10 @@ const DayMenu = (props) => {
             document.getElementsByClassName("eventscontainer")[0].appendChild(eventCell);
         }
         for (let i = 0; i < events.length; i++) {
-            console.log(events[i].neighbors);
             let event = events[i];
+            if (dayjs(event.day).format('D') !== dayjs(props.chosenDate).format('D')) {
+                continue;
+            }
             event.iam = event.iam - 1;
             let eventCell = document.getElementsByClassName("event")[i];
             let width = "calc(" + (100 / event.neighbors) + "% - " + (timeoffset / event.neighbors) + "px)"
@@ -124,6 +203,7 @@ const DayMenu = (props) => {
     }
 
     const handleSubmit = async (e) => {
+        console.log(mode);
         e.preventDefault();
         if (eventEndTime.isBefore(eventStartTime)) {
             setError("End time must be after start time");
@@ -139,20 +219,44 @@ const DayMenu = (props) => {
             day: dayjs(props.chosenDate).format('YYYY-MM-DD'),
             startTime: eventStartTime.format('HH:mm'),
             duration: eventEndTime.subtract(eventStartTime.hour(), 'hour').subtract(eventStartTime.minute(), 'minute').format('HH:mm'),
-            event_category: "task"
+            event_category: eventType
         };
-        try {
-            let response = await EventsService.createEvent(props.calendarid, event);
-            console.log(response);
-            setMenuEvents(false);
-            props.setShowForm(false);
-        } catch (error) {
-            setError(error.response.data.message);
+        if (mode === "Add Event") {
+
+            try {
+                let response = await EventsService.createEvent(props.calendarid, event);
+                console.log(response);
+                props.getCalendarData();
+                props.setShowForm(false);
+                setMenuEvents(true);
+                props.setShowForm(true);
+                setEditEvent(false);
+
+            } catch (error) {
+                setError(error.response.data.message);
+            }
+        }
+        else {
+            try {
+                let response = await EventsService.updateEvent(eventtoedit.id, event);
+                console.log(response);
+                props.getCalendarData();
+                props.setShowForm(false);
+                setMenuEvents(true);
+                props.setShowForm(true);
+                setEditEvent(false);
+
+            } catch (error) {
+                setError(error.response.data.message);
+            }
         }
     }
 
     const openCreateEvent = () => {
-        setMenuEvents(true);
+        setMode("Add Event");
+        setMenuEvents(false);
+        setSeeEvent(false);
+        setEditEvent(true);
         setEventName("");
         setEventDescription("");
         console.log(eventStartTime);
@@ -161,63 +265,55 @@ const DayMenu = (props) => {
         setEventType("");
         setError("");
     }
-
-
-    const [events, setEvents] = useState([
-        {
-            id: 1,
-            name: "test1",
-            day: "2024-03-26T00:00:00.000Z",
-            startTime: "11:00:00",
-            duration: "02:05:00",
-            eventCategory: "task"
-        },
-        {
-            id: 2,
-            name: "test2",
-            day: "2024-03-26T00:00:00.000Z",
-            startTime: "11:25:00",
-            duration: "00:35:00",
-            eventCategory: "task"
-        },
-        {
-            id: 3,
-            name: "test3",
-            day: "2024-03-26T00:00:00.000Z",
-            startTime: "13:25:00",
-            duration: "00:35:00",
-            eventCategory: "task"
-        },
-        {
-            id: 4,
-            name: "test4",
-            day: "2024-03-26T00:00:00.000Z",
-            startTime: "11:00:00",
-            duration: "02:00:00",
-            eventCategory: "task"
-        },
-        {
-            id: 5,
-            name: "test5",
-            day: "2024-03-26T00:00:00.000Z",
-            startTime: "13:25:00",
-            duration: "00:45:00",
-            eventCategory: "task"
-        },
-        {
-            id: 6,
-            name: "test6",
-            day: "2024-03-26T00:00:00.000Z",
-            startTime: "10:35:00",
-            duration: "00:35:00",
-            eventCategory: "task"
+    const openEditEvent = () => {
+        console.log(eventtoedit);
+        if (!eventtoedit) {
+            console.log("eventtoedit is null");
+            return;
         }
-    ]);
+        setMode("Edit Event");
+        setMenuEvents(false);
+        setSeeEvent(false);
+        setEditEvent(true);
+        setEventName(eventtoedit.name);
+        setEventDescription(eventtoedit.description);
+        setEventStartTime(dayjs(eventtoedit.startTime, 'HH:mm:ss'));
+        let endTime = dayjs(eventtoedit.startTime, 'HH:mm:ss').add(dayjs(eventtoedit.duration, 'HH:mm:ss').hour(), 'hour').add(dayjs(eventtoedit.duration, 'HH:mm:ss').minute(), 'minute');
+        console.log(endTime);
+        setEventEndTime(endTime);
+        setEventType(eventtoedit.eventCategory);
+        setError("");
+    }
+
+
+
+    const openEvent = (e) => {
+        console.log("openEvent");
+        console.log(e.target.key);
+        for (let i = 0; i < events.length; i++) {
+            if (events[i].id === e.target.key) {
+                setSeeEventName(events[i].name);
+                console.log(events[i]);
+                setSeeEventDescription(events[i].description);
+                setSeeEventStartTime(events[i].eventStartTime);
+                setSeeEventEndTime(events[i].eventEndTime);
+                setSeeEventType(events[i].eventCategory);
+                setSeeEvent(true);
+                setMenuEvents(false);
+                setEventToEdit(events[i]);
+                console.log(eventtoedit);
+                break;
+            }
+        }
+
+
+    }
+
 
     useEffect(() => {
-        renderTable();
         renderEvents();
-    }, []);
+        renderTable();
+    }, [props.showForm, props.calendarData]);
 
     return (
         <div>
@@ -231,19 +327,20 @@ const DayMenu = (props) => {
                     transform: 'translate(-50%, -50%)',
                     display: props.showForm ? 'block' : 'none'  // Conditional display
                 }}
+
             >
                 <Paper elevation={4} sx={{ p: 4, mt: 10 }} style={{ textAlign: "center" }} className={"eventPaper"}>
-                    <Typography variant="h4">{dayjs(props.chosenDate).format('MMMM D [events]')}</Typography>
+                    <Typography variant="h4">{dayjs(props.chosenDate).format('MMMM D')}</Typography>
                     <div className="eventscontainer"
                         style={{
-                            display: menuEvents ? 'none' : 'block'
+                            display: menuEvents ? 'block' : 'none'
                         }}>
                         <table id="timetable" onClick={() => openCreateEvent()}>
                         </table>
                     </div>
                     <div className="eventedit"
                         style={{
-                            display: menuEvents ? 'block' : 'none'
+                            display: editEvent ? 'block' : 'none'
                         }}>
                         <form method="post"
                             className="login_form"
@@ -287,28 +384,55 @@ const DayMenu = (props) => {
                                 value={dayjs(eventEndTime)}
                                 onChange={(e) => setEventEndTime(e)}
                             />
-                            <TextField
-                                label="Event Type"
-                                variant="outlined"
-                                required
+                            <InputLabel htmlFor="demo-simple-select" sx={{ textAlign: "left" }}>Event Type</InputLabel>
+                            <Select
+                                labelId="demo-simple-select-label"
+                                sx={{
+                                    textAlign: "left"
+                                }}
                                 value={eventType}
+                                id="demo-simple-select"
                                 onChange={(e) => setEventType(e.target.value)}
-                            />
+                            >
+                                <MenuItem value={"arrangement"}><div className="typecircle" style={{ backgroundColor: arrangementColor }}>Arrangement</div></MenuItem>
+                                <MenuItem value={"reminder"}><div className="typecircle" style={{ backgroundColor: reminderColor }}>Reminder</div></MenuItem>
+                                <MenuItem value={"task"}><div className="typecircle" style={{ backgroundColor: taskColor }}>Task</div></MenuItem>
+                                <MenuItem value={"holiday"}><div className="typecircle" style={{ backgroundColor: holidayColor }}>Holiday</div></MenuItem>
+                                <MenuItem value={"other"}><div className="typecircle" style={{ backgroundColor: otherColor }}>Other</div></MenuItem>                            </Select>
+                            {/* 'arrangement', 'reminder', 'task', 'holiday', 'other' */}
 
                             {error && <Alert severity="error">{error}</Alert>}
 
                             <Button variant="contained" type="submit">
-                                Add event
+                            {mode}
                             </Button>
                         </form>
                     </div>
+                    <div className="eventsee"
+                        style={{
+                            display: seeEvent ? 'block' : 'none'
+                        }}>
+                        <Typography variant="h5">{seeEventName}</Typography>
+                        <Typography variant="body1">{seeEventDescription}</Typography>
+                        <Typography variant="body1">{seeEventStartTime.format('HH:mm')} - {seeEventEndTime.format('HH:mm')}</Typography>
+                        <SwitchType type={seeEventType} />
+
+                        <Button variant="contained" onClick={() => openEditEvent()}>Edit Event</Button>
+                    </div>
                     <Fab color="error" aria-label="edit" sx={{ position: 'absolute', top: 26, right: 26, height: 44, width: 44 }} onClick={() => {
                         props.setShowForm(false)
-                        setMenuEvents(false)
+                        setMenuEvents(true)
+                        setEditEvent(false)
+                        setSeeEvent(false)
                     }}>
                         <CloseIcon />
                     </Fab>
-                    <Fab color="success" aria-label="edit" sx={{ position: 'absolute', top: 26, left: 26, height: 44, width: 44, display: menuEvents ? '' : 'none' }} onClick={() => setMenuEvents(false)}>
+                    <Fab color="success" aria-label="edit" sx={{ position: 'absolute', top: 26, left: 26, height: 44, width: 44, display: menuEvents ? 'none' : '' }} onClick={() => {
+                        setEditEvent(false)
+                        setSeeEvent(false)
+                        setMenuEvents(true)
+
+                    }}>
                         <ArrowBackIcon />
                     </Fab>
                 </Paper>

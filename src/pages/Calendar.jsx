@@ -41,7 +41,7 @@ const Calendar = () => {
             console.log(res);
         });
     }
-    
+
     useEffect(() => {
         getCalendarData();
     }, [day, id, showType])
@@ -64,7 +64,7 @@ const Calendar = () => {
         const firstDayOfMonth = new Date(year, month, 1);
         const lastDayOfMonth = new Date(year, month + 1, 0);
         const daysInPreviousMonth = new Date(year, month, 0).getDate();
-    
+
         for (let i = 0; i < 6; i++) {
             const cells = [];
             for (let j = 0; j < 7; j++) {
@@ -73,7 +73,7 @@ const Calendar = () => {
                 const cellClass = isCurrentMonth ? "cell" : "graycell";
                 const textColor = isCurrentMonth ? "white" : "gray";
                 const handleClick = isCurrentMonth ? cellClick : null;
-    
+
                 let displayDay = '';
                 if (dayNumber <= 0) {
                     displayDay = daysInPreviousMonth + dayNumber;
@@ -82,7 +82,7 @@ const Calendar = () => {
                 } else {
                     displayDay = dayNumber;
                 }
-    
+
                 cells.push(
                     <div
                         className={(dayNumber === today.getDate() && today.getMonth() === month && today.getFullYear() === year) ? "todaycell" : cellClass}
@@ -109,11 +109,11 @@ const Calendar = () => {
                         </div>
                         <div className="month-weekselect">
                             <IconButton className="arrow" onClick={() => onMoveClicked("prev")} aria-label="Example">
-                                <NavigateBeforeIcon/>
+                                <NavigateBeforeIcon />
                             </IconButton>
                             <Typography variant="h5" color="textPrimary" textAlign="center">{(day.toDateString()).split(' ')[1]}</Typography>
                             <IconButton className="arrow" onClick={() => onMoveClicked("next")} aria-label="Example">
-                                <NavigateNextIcon/>
+                                <NavigateNextIcon />
                             </IconButton>
                         </div>
                     </div>
@@ -124,12 +124,20 @@ const Calendar = () => {
                             ))}
                         </div>
                         {generateCalendarGrid()}
-                        <DayMenu chosenDate={chosenDate} showForm={showForm} setShowForm={setShowForm} calendarid={id}/>
+                        <DayMenu chosenDate={chosenDate}
+                            showForm={showForm}
+                            setShowForm={setShowForm}
+                            calendarid={id}
+                            calendarData={calendarData}
+                            year={year}
+                            month={month} 
+                            getCalendarData={getCalendarData}
+                            />
                     </div>
                 </div>
-                : 
+                :
                 <div>
-                    <Typography varant="h5" color="textPrimary" textAlign="center" marginTop="100px">{calendarData.message == "No token provided" ? "Access denied": calendarData.message}</Typography>
+                    <Typography varant="h5" color="textPrimary" textAlign="center" marginTop="100px">{calendarData.message == "No token provided" ? "Access denied" : calendarData.message}</Typography>
                 </div>
             }
         </div>
