@@ -3,20 +3,26 @@ import { Paper, Typography, Container, Box, Fab, Alert, ButtonBase, TextField, B
 import { Link, useNavigate } from "react-router-dom";
 import AddIcon from '@mui/icons-material/Add';
 import CalendarService from "../../API/CalendarsService";
+import CloseIcon from '@mui/icons-material/Close';
+import { useContextProvider } from "../ContextProvider";
 
 const AddCalendar = () => {
     const [name, setName] = useState("");
     const [public_, setPublic] = useState(true);
     const [error, setError] = useState();
     const [showForm, setShowForm] = useState(false);
+    const {setSideMenuNeedRedraw, sideMenuNeedRedraw} = useContextProvider();
 
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await CalendarService.createCalendar(name, !public_);
-            window.location.reload();
+            await CalendarService.createCalendar(name, !public_);
+            setSideMenuNeedRedraw(!sideMenuNeedRedraw);
+            setName("");
+            setPublic(true);
+            setShowForm(false);
         }
         catch (error) {
             setError(error.response.data.message);
@@ -83,12 +89,12 @@ const AddCalendar = () => {
                         {error && <Alert severity="error">{error}</Alert>}
 
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <Button variant="contained" type="submit" style={{width: "49%"}}>
+                            <Button variant="contained" type="submit" style={{width: "100%"}}>
                                 Create
                             </Button>
-                            <Button variant="contained" onClick={() => setShowForm(false)} style={{width: "49%"}}>
-                                Cancel
-                            </Button>
+                            <Fab color="error" aria-label="edit" sx={{ position: 'absolute', top: 26, right: 26, height: 44, width: 44, mt: 15, mr: 2 }} onClick={() => {setShowForm(false)}}>
+                                    <CloseIcon />
+                            </Fab>
                         </div>
                     </form>
                 </Paper>

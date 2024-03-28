@@ -29,7 +29,7 @@ const Navbar = ({ toggleSideMenu }) => {
           }}
           className="nav_bar">
             {user ?
-                <Link style={{ textDecoration: 'none'}} onClick={toggleSideMenu}>
+                <Link style={{ textDecoration: 'none', marginLeft: "15px"}} onClick={toggleSideMenu}>
                     <Typography variant="h5" color="textPrimary">Menu</Typography>
                 </Link>
             :

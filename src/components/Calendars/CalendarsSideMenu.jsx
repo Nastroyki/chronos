@@ -10,26 +10,25 @@ import { useContextProvider } from "../ContextProvider";
 import { getUserFromLocalStorage, logout } from "../../store/store";
 
 const CalendarsSideMenu = ({isOpen}) => {
-    const { calendarData } = useContextProvider();
-    const [calendars, setCalendars] = useState([]);
+    const { calendarData, calendarsList, setCalendarsList, sideMenuNeedRedraw} = useContextProvider();
     const [user, setUser] = useState(getUserFromLocalStorage());
 
     useEffect(() => {
         CalendarService.getAllCalendars().then((calendars_) => {
             if (calendars_.length !== 0) {
-                setCalendars(calendars_);
+                setCalendarsList(calendars_);
             }
             else {
                 // logout();
             }
         });
         setUser(getUserFromLocalStorage);
-    }, [calendarData]);
+    }, [calendarData, sideMenuNeedRedraw]);
 
     return (
         <div className={`sidebar ${isOpen ? 'open' : ''}`} style={{ marginTop: "0px"}}>
             {(user) && (<AddCalendar />)}
-            {calendars ? <CalendarsList calendars={calendars} /> : <Box>There is no calendars</Box>}
+            {calendarsList ? <CalendarsList calendars={calendarsList} /> : <Box>There is no calendars</Box>}
         </div>
     )
 }

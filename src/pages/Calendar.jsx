@@ -117,21 +117,21 @@ const Calendar = () => {
                 <div className="calendarControll">
                     <div className="calendarControllPanel">
                         <div className="name-edit">
-                            <Typography varant="h5" color="textPrimary" textAlign="center" marginLeft="20px">{calendarData.calendarName}</Typography>
+                            <Typography variant="h4" color="textPrimary" textAlign="center" marginLeft="20px">{calendarData.calendarName}</Typography>
                             {(getUserFromLocalStorage() 
                               && (calendarData.author_id == getUserFromLocalStorage().id 
                                   || calendarData.access == "write")) && 
-                                (<IconButton onClick={() => onEditClicked("prev")}>
+                                (<IconButton sx={{marginTop: "-5px"}} onClick={() => onEditClicked("prev")}>
                                     <EditIcon/>
                                 </IconButton>)
                             }
                         </div>
                         <div className="month-weekselect">
-                            <IconButton className="arrow" onClick={() => onMoveClicked("prev")} aria-label="Example">
+                            <IconButton sx={{marginTop: "-5px"}} className="arrow" onClick={() => onMoveClicked("prev")} aria-label="Example">
                                 <NavigateBeforeIcon />
                             </IconButton>
                             <Typography variant="h5" color="textPrimary" textAlign="center">{(day.toDateString()).split(' ')[1]}</Typography>
-                            <IconButton className="arrow" onClick={() => onMoveClicked("next")} aria-label="Example">
+                            <IconButton sx={{marginTop: "-5px"}} className="arrow" onClick={() => onMoveClicked("next")} aria-label="Example">
                                 <NavigateNextIcon />
                             </IconButton>
                         </div>
@@ -165,54 +165,3 @@ const Calendar = () => {
 };
 
 export default Calendar;
-
-
-
-
-
-// const Calendar = () => {
-//     const { id } = useParams();
-//     const [day , setDay] = useState(dayjs());
-
-//     // useEffect(() => {
-//     //     CalendarService.getAllCalendars().then((calendars_) => {
-//     //         setCalendars(calendars_);
-//     //     });
-//     // }, []);
-
-//     return (
-//         <div style={{ marginTop: "50px" }}>
-//             <Typography variant="h3" align="center" color="colorSecondary" marginTop={"100px"} width={"100%"} marginBottom={"20px"}>calendar_name</Typography>
-//             <div style={{ display: "flex" }}>
-//                 <div style={{ display: "flex", flexDirection: "column" }}>
-//                     <DateCalendar defaultValue={day} onChange={(newValue) => setDay(newValue)}/>
-//                 </div>
-//                 <div style={{ display: "flex", flexDirection: "column", marginLeft:"20px"}}>
-//                     <Typography variant="h4" align="left" color="colorSecondary" marginTop={"10px"} width={"100%"} marginBottom={"20px"}>{day.format('MMMM D [events:]')}</Typography>
-//                 </div>
-//             </div>
-//         </div>
-//     )
-// }
-
-// export default Calendar;
-
-
-// const Calendars = () => {
-//     const [calendars, setCalendars] = useState([]);
-
-//     useEffect(() => {
-//         CalendarService.getAllCalendars().then((calendars_) => {
-//             setCalendars(calendars_);
-//         });
-//     }, []);
-
-//     return (
-//         <div style={{ marginTop: "50px" }}>
-//             {calendars ? <CalendarsList calendars={calendars} /> : <Box>There is no calendars</Box>}
-//             <AddCalendar />
-//         </div>
-//     )
-// }
-
-// export default Calendars;
