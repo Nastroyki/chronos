@@ -13,11 +13,12 @@ import { useContextProvider } from "../ContextProvider";
 
 
 const CalendarEditMenu = ({showForm, setShowForm, getCalendarData}) => {
-    const { calendarData } = useContextProvider();
+    const { calendarData, calendarsList } = useContextProvider();
     const [calendarName_, setCalendarName] = useState("");
     const [public_, setPublic] = useState(false);
     const [error, setError] = useState();
     const { calendarId } = useContextProvider();
+    const navigate = useNavigate();
 
     useEffect(() => {
         setCalendarName(calendarData.calendarName);
@@ -35,6 +36,22 @@ const CalendarEditMenu = ({showForm, setShowForm, getCalendarData}) => {
         }
     }
 
+    const handleDelete = async () => {
+        try {
+            await CalendarService.deleteCalendar(calendarId);
+            const fCalendars = calendarsList.calendars.filter(calendar => calendar.id != calendarId);
+            if (fCalendars.length == 0) {
+                navigate(`/`);
+            }
+            else {
+                navigate(`/calendars/${fCalendars[fCalendars.length - 1].id}`);
+            }
+            setShowForm(false);
+        }
+        catch (error) {
+            setError(error.response.data.message);
+        }
+    }
 
     return (
         <div>
@@ -83,9 +100,12 @@ const CalendarEditMenu = ({showForm, setShowForm, getCalendarData}) => {
                             <Button variant="contained" onClick={() => {handleSubmit()}} style={{width: "49%"}}>
                                 Save changes
                             </Button>
-                            <Button variant="contained" onClick={() => {setShowForm(false)}} style={{width: "49%"}}>
-                                Cancel
+                            <Button variant="contained" color="error" onClick={() => {handleDelete()}} style={{width: "49%"}}>
+                                Delete
                             </Button>
+                            <Fab color="error" aria-label="edit" sx={{ position: 'absolute', top: 26, right: 26, height: 44, width: 44, mt: 15, mr: 2 }} onClick={() => {setShowForm(false)}}>
+                                    <CloseIcon />
+                            </Fab>
                         </div>
                     </form>
                 </Paper>)}

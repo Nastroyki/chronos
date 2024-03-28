@@ -36,11 +36,6 @@ router.delete('/:event_id', errorHandler(async (req, res) => {
 
     if (user_access.access !== 'write') throw 'Permition denied';
     
-    await Category.destroy({
-        where: {
-            event_id: event.id
-        }
-    });
     await event.destroy();
 
     return res.status(200).json(generateResponse('Event deleted'));
