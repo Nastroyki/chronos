@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { IconButton, Paper, Typography, Container, Box, Fab, colors } from "@mui/material";
-import { Link, useParams } from "react-router-dom";
+import { Link, useAsyncValue, useParams } from "react-router-dom";
 import { getUserFromLocalStorage, logout } from "../store/store";
 import CalendarService from "../API/CalendarsService";
 import { DateCalendar } from '@mui/x-date-pickers';
@@ -13,9 +13,15 @@ import DayMenu from "../components/Calendars/DayMenu";
 import EditIcon from '@mui/icons-material/Edit';
 import { useContextProvider } from "../components/ContextProvider";
 import CalendarEditMenu from "../components/Calendars/CalendarEditmenu";
+import EventsService from "../API/EventsService";
 
 
 const Calendar = () => {
+    const arrangementColor = "orange";
+    const reminderColor = "red";
+    const taskColor = "blue";
+    const holidayColor = "green";
+    const otherColor = "purple";
     // Array to hold the days of the week
     const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const daysInMonthF = (year, month) => new Date(year, month + 1, 0).getDate();
@@ -35,7 +41,7 @@ const Calendar = () => {
     const [showCalendarEditForm, setShowCalendarEditForm] = useState(false);
 
     const cellClick = (e) => {
-        setChosenDate(new Date(year, month, e.target.innerHTML));
+        setChosenDate(new Date(year, month, e.target.innerHTML.split('<')[0]));
         setShowForm(true);
     }
 
@@ -46,6 +52,7 @@ const Calendar = () => {
         CalendarService.getcalendarData(id, `${year}-${month}-${day_}`, showType).then(async (res) => {
             setCalendarData(res);
             console.log(res);
+            renderDots(res);
         });
     }
 
@@ -53,6 +60,7 @@ const Calendar = () => {
         getCalendarData();
         setCalendarId(id);
     }, [day, id, showType])
+
 
 
     const onMoveClicked = (direction) => {
@@ -68,6 +76,104 @@ const Calendar = () => {
 
     const onEditClicked = () => {
         setShowCalendarEditForm(true);
+    }
+
+    const [events, setEvents] = useState([]);
+
+    const getEvents = async (calendarData) => {
+        console.log(calendarData);
+        if (!calendarData.Events) {
+            return;
+        }
+        let events_ = [...calendarData.Events];
+        if (!events_ || events_.length === 0) {
+            return;
+        }
+        for (let i = 0; i < events_.length; i++) {
+            let res = await EventsService.getEvent(events_[i].id);
+            events_[i].day = res.day;
+            events_[i].startTime = res.startTime;
+            events_[i].duration = res.duration;
+            events_[i].description = res.description;
+            events_[i].eventCategory = res.eventCategory;
+        }
+        return events_;
+    }
+
+    const renderDots = async (calendarData) => {
+        let events = await getEvents(calendarData);
+        console.log(events);
+        if (!events || events.length === 0) {
+            return;
+        }
+        let boxes = document.getElementsByClassName("eventsdots");
+        console.log(boxes);
+        for (let i = 0; i < boxes.length; i++) {
+            boxes[i].innerHTML = "";
+        }
+        // for (let i = 0; i < events.length; i++) {
+        //     let day = events[i].day;
+        //     let eventCategory = events[i].eventCategory;
+        //     for (let j = 0; j < boxes.length; j++) {
+        //         if (boxes[j].parentElement.innerHTML.split('<')[0] == dayjs(day).date()) {
+        //             let dot = document.createElement("div");
+        //             dot.className = "eventdot";
+        //             switch (eventCategory) {
+        //                 case "arrangement":
+        //                     dot.style.backgroundColor = arrangementColor;
+        //                     break;
+        //                 case "reminder":
+        //                     dot.style.backgroundColor = reminderColor;
+        //                     break;
+        //                 case "task":
+        //                     dot.style.backgroundColor = taskColor;
+        //                     break;
+        //                 case "holiday":
+        //                     dot.style.backgroundColor = holidayColor;
+        //                     break;
+        //                 default:
+        //                     dot.style.backgroundColor = otherColor;
+        //             }
+        //             console.log("dot");
+        //             boxes[j].appendChild(dot);
+        //         }
+        //     }
+        // }
+        for (let i = 0; i < boxes.length; i++) {
+            let day = boxes[i].parentElement.innerHTML.split('<')[0];
+            for (let j = 0; j < events.length; j++) {
+                if (day == dayjs(events[j].day).date()) {
+                    let dot = document.createElement("div");
+                    dot.className = "eventdot";
+                    switch (events[j].eventCategory) {
+                        case "arrangement":
+                            dot.style.backgroundColor = arrangementColor;
+                            break;
+                        case "reminder":
+                            dot.style.backgroundColor = reminderColor;
+                            break;
+                        case "task":
+                            dot.style.backgroundColor = taskColor;
+                            break;
+                        case "holiday":
+                            dot.style.backgroundColor = holidayColor;
+                            break;
+                        default:
+                            dot.style.backgroundColor = otherColor;
+                    }
+                    let thereIs = false;
+                    for (let k = 0; k < boxes[i].childNodes.length; k++) {
+                        if (boxes[i].childNodes[k].style.backgroundColor == dot.style.backgroundColor) {
+                            thereIs = true;
+                        }
+                    }
+                    if (!thereIs) {
+                    boxes[i].appendChild(dot);
+                    }
+                }
+            }
+        }
+
     }
 
     const generateCalendarGrid = () => {
@@ -103,6 +209,12 @@ const Calendar = () => {
                         onClick={handleClick}
                     >
                         {displayDay}
+                        {isCurrentMonth ? 
+                        <div 
+                            className="eventsdots"
+                            key={displayDay}
+                        ></div>
+                        : null}
                     </div>
                 );
             }

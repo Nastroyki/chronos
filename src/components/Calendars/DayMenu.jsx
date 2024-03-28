@@ -84,7 +84,6 @@ const DayMenu = (props) => {
     }
 
     const getEvents = async () => {
-        console.log("getEvents");
         if (!props.calendarData.Events) {
             return;
         }
@@ -94,7 +93,6 @@ const DayMenu = (props) => {
         }
         for (let i = 0; i < events_.length; i++) {
             let res = await EventsService.getEvent(events_[i].id);
-            console.log(res);
             events_[i].day = res.day;
             events_[i].startTime = res.startTime;
             events_[i].duration = res.duration;
@@ -105,7 +103,7 @@ const DayMenu = (props) => {
     }
 
     const renderEvents = async () => {
-        
+
         let oldEvents = document.getElementsByClassName("event");
         while (oldEvents.length > 0) {
             oldEvents[0].remove();
@@ -126,7 +124,6 @@ const DayMenu = (props) => {
             eventCell.className = "event";
             let eventduration = dayjs(event.duration, 'HH:mm:ss')
             let eventStartTime = dayjs(event.startTime, 'HH:mm:ss')
-            console.log(event.startTime);
             let eventHeight = dayjsHour(eventduration) * oneHourHeight;
             eventCell.style.height = eventHeight + "px";
             eventCell.style.top = dayjsHour(eventStartTime) * oneHourHeight + "px";
@@ -142,7 +139,6 @@ const DayMenu = (props) => {
             let time = document.createElement("span");
             let endTime = dayjs(event.startTime, 'HH:mm:ss').add(eventduration.hour(), 'hour').add(eventduration.minute(), 'minute');
             time.innerHTML = eventStartTime.format('HH:mm') + " - " + endTime.format('HH:mm');
-            console.log(event.eventCategory);
             switch (event.eventCategory) {
                 case "arrangement":
                     box.style.backgroundColor = "orange";
@@ -220,7 +216,7 @@ const DayMenu = (props) => {
                     break;
                 }
             }
-            if(!eventCell) {
+            if (!eventCell) {
                 continue;
             }
             let width = "calc(" + (100 / event.neighbors) + "% - " + (timeoffset / event.neighbors) + "px)"
@@ -230,7 +226,6 @@ const DayMenu = (props) => {
     }
 
     const handleSubmit = async (e) => {
-        console.log(mode);
         e.preventDefault();
         if (eventEndTime.isBefore(eventStartTime)) {
             setError("End time must be after start time");
@@ -252,7 +247,6 @@ const DayMenu = (props) => {
 
             try {
                 let response = await EventsService.createEvent(props.calendarid, event);
-                console.log(response);
                 props.getCalendarData();
                 props.setShowForm(false);
                 setMenuEvents(true);
@@ -266,7 +260,6 @@ const DayMenu = (props) => {
         else {
             try {
                 let response = await EventsService.updateEvent(eventtoedit.id, event);
-                console.log(response);
                 props.getCalendarData();
                 props.setShowForm(false);
                 setMenuEvents(true);
@@ -280,27 +273,25 @@ const DayMenu = (props) => {
     }
 
     const openCreateEvent = () => {
-        if ((getUserFromLocalStorage() 
-        && (props.calendarData.author_id == getUserFromLocalStorage().id 
-            || props.calendarData.access == "write"))) {
-                setMode("Add Event");
-                setMenuEvents(false);
-                setSeeEvent(false);
-                setEditEvent(true);
-                setEventName("");
-                setEventDescription("");
-                console.log(eventStartTime);
-                setEventStartTime(dayjs("00:00:00", 'HH:mm:ss'));
-                setEventEndTime(dayjs("00:00:00", 'HH:mm:ss'));
-                setEventType("");
-                setError("");
-            }
+        if ((getUserFromLocalStorage()
+            && (props.calendarData.author_id == getUserFromLocalStorage().id
+                || props.calendarData.access == "write"))) {
+            setMode("Add Event");
+            setMenuEvents(false);
+            setSeeEvent(false);
+            setEditEvent(true);
+            setEventName("");
+            setEventDescription("");
+            setEventStartTime(dayjs("00:00:00", 'HH:mm:ss'));
+            setEventEndTime(dayjs("00:00:00", 'HH:mm:ss'));
+            setEventType("");
+            setError("");
+        }
     }
 
     const openEditEvent = () => {
 
         if (!eventtoedit) {
-            console.log("eventtoedit is null");
             return;
         }
         setMode("Edit Event");
@@ -311,7 +302,6 @@ const DayMenu = (props) => {
         setEventDescription(eventtoedit.description);
         setEventStartTime(dayjs(eventtoedit.startTime, 'HH:mm:ss'));
         let endTime = dayjs(eventtoedit.startTime, 'HH:mm:ss').add(dayjs(eventtoedit.duration, 'HH:mm:ss').hour(), 'hour').add(dayjs(eventtoedit.duration, 'HH:mm:ss').minute(), 'minute');
-        console.log(endTime);
         setEventEndTime(endTime);
         setEventType(eventtoedit.eventCategory);
         setError("");
@@ -320,8 +310,6 @@ const DayMenu = (props) => {
 
 
     const openEvent = (e) => {
-        console.log("openEvent");
-        console.log(e.target.key);
         for (let i = 0; i < events.length; i++) {
             if (events[i].id === e.target.key) {
                 setSeeEventName(events[i].name);
@@ -339,12 +327,10 @@ const DayMenu = (props) => {
 
     const deleteEvent = async () => {
         if (!eventtoedit) {
-            console.log("eventtoedit is null");
             return;
         }
         try {
             let response = await EventsService.deleteEvent(eventtoedit.id);
-            console.log(response);
             props.getCalendarData();
             props.setShowForm(false);
             setSeeEvent(false);
@@ -376,8 +362,8 @@ const DayMenu = (props) => {
                 }}
 
             >
-                <Paper elevation={4} sx={{ p: 4, pl: 0, mt: 10 }} style={{ textAlign: "center" }} className={"eventPaper"}>
-                    <Typography variant="h4">{dayjs(props.chosenDate).format('MMMM D')}</Typography>
+                <Paper elevation={4} sx={{ p: 4, pl: menuEvents ? 0 : 4, mt: 10 }} style={{ textAlign: "center" }} className={"eventPaper"}>
+                    <Typography variant="h4" marginLeft={menuEvents ? "32px" : "0px"}>{dayjs(props.chosenDate).format('MMMM D')}</Typography>
                     <div className="eventscontainer"
                         style={{
                             display: menuEvents ? 'block' : 'none'
@@ -445,32 +431,36 @@ const DayMenu = (props) => {
                                 <MenuItem value={"reminder"}><div className="typecircle" style={{ backgroundColor: reminderColor }}>Reminder</div></MenuItem>
                                 <MenuItem value={"task"}><div className="typecircle" style={{ backgroundColor: taskColor }}>Task</div></MenuItem>
                                 <MenuItem value={"holiday"}><div className="typecircle" style={{ backgroundColor: holidayColor }}>Holiday</div></MenuItem>
-                                <MenuItem value={"other"}><div className="typecircle" style={{ backgroundColor: otherColor }}>Other</div></MenuItem>                            </Select>
-                            {/* 'arrangement', 'reminder', 'task', 'holiday', 'other' */}
+                                <MenuItem value={"other"}><div className="typecircle" style={{ backgroundColor: otherColor }}>Other</div></MenuItem>
+                            </Select>
 
                             {error && <Alert severity="error">{error}</Alert>}
 
                             <Button variant="contained" type="submit">
-                            {mode}
+                                {mode}
                             </Button>
                         </form>
                     </div>
                     <div className="eventsee"
                         style={{
-                            display: seeEvent ? 'block' : 'none'
+                            display: seeEvent ? 'block' : 'none',
+                            width: "100%",
+                            textAlign: "left"
                         }}>
-                        <Typography variant="h5">{seeEventName}</Typography>
-                        <Typography variant="body1">{seeEventDescription}</Typography>
-                        <Typography variant="body1">{seeEventStartTime.format('HH:mm')} - {seeEventEndTime.format('HH:mm')}</Typography>
-                        <SwitchType type={seeEventType} />
-
-                        {(getUserFromLocalStorage() 
-                            && (props.calendarData.author_id == getUserFromLocalStorage().id 
-                                || props.calendarData.access == "write")) && 
-                                (<div>
-                                    <Button variant="contained" onClick={() => openEditEvent()}>Edit Event</Button>
-                                    <Button variant="contained" onClick={() => deleteEvent()} color="error">Delete Event</Button>
-                                </div>
+                        <Typography variant="h4" textAlign={"center"} marginRight={"32px"}>Event name: {seeEventName}</Typography>
+                        <Typography variant="h5" textAlign={"center"} marginRight={"32px"}>{seeEventStartTime.format('HH:mm')} - {seeEventEndTime.format('HH:mm')}</Typography>
+                        <SwitchType type={seeEventType}/>
+                        <br />
+                        <Typography variant="h4">Event description:</Typography>
+                        <Typography variant="h5">{seeEventDescription}</Typography>
+                        <br />
+                        {(getUserFromLocalStorage()
+                            && (props.calendarData.author_id == getUserFromLocalStorage().id
+                                || props.calendarData.access == "write")) &&
+                            (<div>
+                                <Button variant="contained" className="eventbutton" onClick={() => openEditEvent()}>Edit Event</Button>
+                                <Button variant="contained" className="eventbutton" style={{float: "right", marginRight: "32px"}} onClick={() => deleteEvent()} color="error">Delete Event</Button>
+                            </div>
                             )}
                     </div>
                     <Fab color="error" aria-label="edit" sx={{ position: 'absolute', top: 26, right: 26, height: 44, width: 44 }} onClick={() => {

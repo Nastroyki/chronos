@@ -79,3 +79,17 @@
 .cell:hover, .todaycell:hover {
     background-color: #6a6a6a;
 }
+
+.eventsdots {
+    pointer-events: none;
+}
+
+.eventdot {
+    pointer-events: none;
+    height: 20px;
+    width: 20px;
+    background-color: #282828;
+    border-radius: 50%;
+    margin: 0px 2px;
+    display: inline-block;
+}
