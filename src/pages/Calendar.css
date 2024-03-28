@@ -1,5 +1,7 @@
 .calendarControll {
     margin-top: 100px;
+    padding-left: 10px;
+    padding-right: 10px;
     flex-direction: column;
     margin-right: auto;
     margin-left: auto;
@@ -39,6 +41,11 @@
     display: flex;
     flex-direction: row;
     border-bottom: 1px solid #ccc;
+}
+
+.name-edit {
+    display: flex;
+    align-items: center;
 }
 
 .cell, .todaycell, .graycell, .cellhead {

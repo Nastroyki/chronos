@@ -6,10 +6,6 @@ const User_Calendar = sequelize.define('User_Calendar', {
       type: DataTypes.ENUM('write', 'read'),
       defaultValue: 'read'
     }
-    // hide: {
-    //   type: DataTypes.BOOLEAN,
-    //   defaultValue: true
-    // }
 });
 
 export { User_Calendar };

@@ -1,0 +1,65 @@
+.daymenu {
+    width: min(100% - 40px, 600px);
+}
+
+.eventPaper {
+    position: relative;
+}
+
+
+.eventscontainer {
+    height: calc(100vh - 250px);
+    width: 100%;
+    overflow-y: scroll;
+    scrollbar-color: gray #282828;
+    scrollbar-width: thin;
+    margin: 20px;
+    position: relative;
+}
+
+.eventedit {
+    height: calc(100vh - 250px);
+    margin: 20px;
+}
+
+.eventrow {
+    height: 48px;
+}
+
+.eventtime {
+    width: 50px;
+    border-right: 1px solid #ccc;
+    padding-right: 5px;
+    padding-top: 0px;
+}
+
+.timeString {
+    margin-top: 0px;
+    text-align: end;
+}
+
+.eventcell {
+    border: 1px solid #ccc;
+    padding: 0px;
+}
+
+#timetable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+
+.event {
+    position: absolute;
+    margin-left: 50px;
+}
+
+.eventbox {
+    background-color: blueviolet;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    margin: 3px;
+    height: calc(100% - 3px);
+}

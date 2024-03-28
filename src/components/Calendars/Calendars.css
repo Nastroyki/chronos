@@ -6,6 +6,9 @@
     left: -250px; /* Начальное положение за пределами экрана */
     background-color: #111;
     padding-top: 20px;
+    overflow-y: scroll;
+    scrollbar-color: gray #282828;
+    scrollbar-width: thin;
     transition: left 0.2s ease; /* Плавное анимирование */
 }
 

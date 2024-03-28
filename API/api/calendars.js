@@ -17,15 +17,28 @@ router.get('/', errorHandler(async (req, res) => {
     const users = getAuthUsers();
     const cur_user = await User.findByPk(users[cur_userId]);
 
-    const calendars = await cur_user.getCalendars();
+    const calendars_links = await User_Calendar.findAll({
+        where: {
+            user_id: cur_user.id,
+        }
+    }, {
+        include: Calendar
+    });
 
+    let calendars = []
+    for (const calendar_link of calendars_links) {
+        console.log(calendar_link);
+        const calendar = await Calendar.findByPk(calendar_link.calendar_id);
+        
+        calendars.push({
+            id: calendar.id,
+            name: calendar.name,
+            public: calendar.public
+        });
+    }
     return res.status(200).json(generateResponse('Calendars data', {
         data: {
-            calendars: calendars.map(calendar => ({
-                id: calendar.id,
-                name: calendar.name,
-                public: calendar.public
-            }))
+            calendars: calendars
         }
     }));
 }));
@@ -88,15 +101,15 @@ const getDateSliceByType = (curDay, type) => {
 router.get('/:calendar_id', errorHandler(async (req, res) => {
     const calendarId = req.params.calendar_id
     const calendar = await Calendar.findByPk(calendarId);
-    console.log(req);
     if (!calendar) throw 'Calendar not found';
+    let user_access;
     
     if (!calendar.public) {
         const cur_userId = await getUserFromRequest(req);
         const users = getAuthUsers();
         const cur_user = await User.findByPk(users[cur_userId]);
     
-        const user_access = await User_Calendar.findOne({
+        user_access = await User_Calendar.findOne({
             where: {
                 user_id: cur_user.id,
                 calendar_id: calendar.id
@@ -121,6 +134,9 @@ router.get('/:calendar_id', errorHandler(async (req, res) => {
     return res.status(200).json(generateResponse('Event data', {
         data: {
             calendarName: calendar.name,
+            author_id: calendar.author_id,
+            public: calendar.public,
+            access: user_access ? user_access.access : "read",
             Events: events_data.map(event => ({ id: event.id, name: event.name, day: (new Date(event.day).getDate())}))
         }
     }));
@@ -166,10 +182,12 @@ router.post('/:calendar_id', errorHandler(async (req, res) => {
 
 
 router.patch('/:calendar_id', errorHandler(async (req, res) => {
+    console.log("Patch!");
     const cur_userId = await getUserFromRequest(req);
     const users = getAuthUsers();
     const cur_user = await User.findByPk(users[cur_userId]);
     const calendarId = req.params.calendar_id
+    console.log("User founded!");
 
     const calendar = await Calendar.findByPk(calendarId);
     if (!calendar) throw 'Calendar not found';

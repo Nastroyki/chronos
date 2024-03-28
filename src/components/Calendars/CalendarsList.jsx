@@ -3,7 +3,6 @@ import { Container, Typography, Paper, Box } from "@mui/material";
 import CalendarItem from "./CalendarItem";
 
 const CalendarsList = (props) => {
-    console.log(props.calendars);
     return (
         <Container sx={{ paddingLeft: "0px"}}>
             {((props.calendars.calendars) && (props.calendars.calendars.length)) ? (

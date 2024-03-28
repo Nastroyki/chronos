@@ -10,22 +10,29 @@ import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { Directions, TodayRounded } from "@mui/icons-material";
 import DayMenu from "../components/Calendars/DayMenu";
+import EditIcon from '@mui/icons-material/Edit';
+import { useContextProvider } from "../components/ContextProvider";
+import CalendarEditMenu from "../components/Calendars/CalendarEditmenu";
+
 
 const Calendar = () => {
     // Array to hold the days of the week
     const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const daysInMonthF = (year, month) => new Date(year, month + 1, 0).getDate();
 
-    const [calendarData, setCalendarData] = useState([]);
+    // const [calendarData, setCalendarData] = useState([]);
     const [day, setday] = useState(new Date());
     const [showType, setType] = useState("month");
     const { id } = useParams();
+    const { setCalendarId } = useContextProvider();
+    const { calendarData, setCalendarData } = useContextProvider();
 
     const year = day.getFullYear();
     const month = day.getMonth();
 
     const [chosenDate, setChosenDate] = useState(new Date());
     const [showForm, setShowForm] = useState(false);
+    const [showCalendarEditForm, setShowCalendarEditForm] = useState(false);
 
     const cellClick = (e) => {
         setChosenDate(new Date(year, month, e.target.innerHTML));
@@ -44,6 +51,7 @@ const Calendar = () => {
 
     useEffect(() => {
         getCalendarData();
+        setCalendarId(id);
     }, [day, id, showType])
 
 
@@ -56,6 +64,10 @@ const Calendar = () => {
             newDate.setMonth(newDate.getMonth() + 1);
         }
         setday(newDate);
+    }
+
+    const onEditClicked = () => {
+        setShowCalendarEditForm(true);
     }
 
     const generateCalendarGrid = () => {
@@ -104,8 +116,15 @@ const Calendar = () => {
             {calendarData.type !== 'error' ?
                 <div className="calendarControll">
                     <div className="calendarControllPanel">
-                        <div>
+                        <div className="name-edit">
                             <Typography varant="h5" color="textPrimary" textAlign="center" marginLeft="20px">{calendarData.calendarName}</Typography>
+                            {(getUserFromLocalStorage() 
+                              && (calendarData.author_id == getUserFromLocalStorage().id 
+                                  || calendarData.access == "write")) && 
+                                (<IconButton onClick={() => onEditClicked("prev")}>
+                                    <EditIcon/>
+                                </IconButton>)
+                            }
                         </div>
                         <div className="month-weekselect">
                             <IconButton className="arrow" onClick={() => onMoveClicked("prev")} aria-label="Example">
@@ -133,6 +152,7 @@ const Calendar = () => {
                             month={month} 
                             getCalendarData={getCalendarData}
                             />
+                        <CalendarEditMenu showForm={showCalendarEditForm} setShowForm={setShowCalendarEditForm} getCalendarData={getCalendarData}/>
                     </div>
                 </div>
                 :

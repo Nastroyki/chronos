@@ -10,6 +10,7 @@ import dayjs from "dayjs";
 import "./DayMenu.css";
 import EventsService from "../../API/EventsService";
 import SwitchType from "./SwitchType";
+import { getUserFromLocalStorage, logout } from "../../store/store";
 
 const DayMenu = (props) => {
     const oneHourHeight = 96;
@@ -105,11 +106,11 @@ const DayMenu = (props) => {
 
     const renderEvents = async () => {
         
-        await getEvents();
         let oldEvents = document.getElementsByClassName("event");
         while (oldEvents.length > 0) {
             oldEvents[0].remove();
         }
+        await getEvents();
 
         if (!events || events.length === 0) {
             return;
@@ -120,6 +121,7 @@ const DayMenu = (props) => {
             if (dayjs(event.day).format('D') !== dayjs(props.chosenDate).format('D')) {
                 continue;
             }
+            if (!event.startTime) continue;
             let eventCell = document.createElement("div");
             eventCell.className = "event";
             let eventduration = dayjs(event.duration, 'HH:mm:ss')
@@ -278,20 +280,25 @@ const DayMenu = (props) => {
     }
 
     const openCreateEvent = () => {
-        setMode("Add Event");
-        setMenuEvents(false);
-        setSeeEvent(false);
-        setEditEvent(true);
-        setEventName("");
-        setEventDescription("");
-        console.log(eventStartTime);
-        setEventStartTime(dayjs("00:00:00", 'HH:mm:ss'));
-        setEventEndTime(dayjs("00:00:00", 'HH:mm:ss'));
-        setEventType("");
-        setError("");
+        if ((getUserFromLocalStorage() 
+        && (props.calendarData.author_id == getUserFromLocalStorage().id 
+            || props.calendarData.access == "write"))) {
+                setMode("Add Event");
+                setMenuEvents(false);
+                setSeeEvent(false);
+                setEditEvent(true);
+                setEventName("");
+                setEventDescription("");
+                console.log(eventStartTime);
+                setEventStartTime(dayjs("00:00:00", 'HH:mm:ss'));
+                setEventEndTime(dayjs("00:00:00", 'HH:mm:ss'));
+                setEventType("");
+                setError("");
+            }
     }
+
     const openEditEvent = () => {
-        console.log(eventtoedit);
+
         if (!eventtoedit) {
             console.log("eventtoedit is null");
             return;
@@ -318,7 +325,6 @@ const DayMenu = (props) => {
         for (let i = 0; i < events.length; i++) {
             if (events[i].id === e.target.key) {
                 setSeeEventName(events[i].name);
-                console.log(events[i]);
                 setSeeEventDescription(events[i].description);
                 setSeeEventStartTime(events[i].eventStartTime);
                 setSeeEventEndTime(events[i].eventEndTime);
@@ -326,12 +332,28 @@ const DayMenu = (props) => {
                 setSeeEvent(true);
                 setMenuEvents(false);
                 setEventToEdit(events[i]);
-                console.log(eventtoedit);
                 break;
             }
         }
+    }
 
-
+    const deleteEvent = async () => {
+        if (!eventtoedit) {
+            console.log("eventtoedit is null");
+            return;
+        }
+        try {
+            let response = await EventsService.deleteEvent(eventtoedit.id);
+            console.log(response);
+            props.getCalendarData();
+            props.setShowForm(false);
+            setSeeEvent(false);
+            setMenuEvents(true);
+            props.setShowForm(true);
+            setEditEvent(false);
+        } catch (error) {
+            setError(error.response.data.message);
+        }
     }
 
 
@@ -354,7 +376,7 @@ const DayMenu = (props) => {
                 }}
 
             >
-                <Paper elevation={4} sx={{ p: 4, mt: 10 }} style={{ textAlign: "center" }} className={"eventPaper"}>
+                <Paper elevation={4} sx={{ p: 4, pl: 0, mt: 10 }} style={{ textAlign: "center" }} className={"eventPaper"}>
                     <Typography variant="h4">{dayjs(props.chosenDate).format('MMMM D')}</Typography>
                     <div className="eventscontainer"
                         style={{
@@ -442,7 +464,14 @@ const DayMenu = (props) => {
                         <Typography variant="body1">{seeEventStartTime.format('HH:mm')} - {seeEventEndTime.format('HH:mm')}</Typography>
                         <SwitchType type={seeEventType} />
 
-                        <Button variant="contained" onClick={() => openEditEvent()}>Edit Event</Button>
+                        {(getUserFromLocalStorage() 
+                            && (props.calendarData.author_id == getUserFromLocalStorage().id 
+                                || props.calendarData.access == "write")) && 
+                                (<div>
+                                    <Button variant="contained" onClick={() => openEditEvent()}>Edit Event</Button>
+                                    <Button variant="contained" onClick={() => deleteEvent()} color="error">Delete Event</Button>
+                                </div>
+                            )}
                     </div>
                     <Fab color="error" aria-label="edit" sx={{ position: 'absolute', top: 26, right: 26, height: 44, width: 44 }} onClick={() => {
                         props.setShowForm(false)

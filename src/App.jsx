@@ -7,6 +7,7 @@ import AppRouter from "./components/AppRouter";
 import CalendarsSideMenu from "./components/Calendars/CalendarsSideMenu";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { ContextProvider } from "./components/ContextProvider"; 
 import "./App.css"
 
 const App = () => {
@@ -29,11 +30,13 @@ const App = () => {
                 <div className="content-container">
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <BrowserRouter>
-                            <Navbar toggleSideMenu={toggleSideMenu} />
-                            <div className={`main-content ${isSideMenuOpen ? 'open' : ''}`}>
-                                <CalendarsSideMenu isOpen={isSideMenuOpen}/>
-                                <AppRouter />
-                            </div>
+                            <ContextProvider>
+                                <Navbar toggleSideMenu={toggleSideMenu} />
+                                <div className={`main-content ${isSideMenuOpen ? 'open' : ''}`}>
+                                    <CalendarsSideMenu isOpen={isSideMenuOpen}/>
+                                    <AppRouter />
+                                </div>
+                            </ContextProvider>
                         </BrowserRouter>
                     </LocalizationProvider>
                 </div>

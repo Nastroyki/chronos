@@ -72,9 +72,25 @@ export default class CalendarsService {
         return response;
     }
 
+    // static async updateCalendar(id, data) {
+    //     try {
+    //         const response = await axios.patch(`http://localhost:3001/api/calendars/${id}`, data, {
+    //             headers: {
+    //                 'Authorization': `Bearer ${getUserFromLocalStorage().token}`
+    //             }
+    //         });
+    //         const calendar = response.data.data;
+    //         return calendar;
+    //     }
+    //     catch (error) {
+    //         return [];
+    //     }
+    // }
+
     static async updateCalendar(id, data) {
         try {
-            const response = await axios.post(`http://localhost:3001/api/calendars/${id}`, data, {
+            console.log(id);
+            const response = await axios.patch(`http://localhost:3001/api/calendars/${id}`, data, {
                 headers: {
                     'Authorization': `Bearer ${getUserFromLocalStorage().token}`
                 }
@@ -83,7 +99,8 @@ export default class CalendarsService {
             return calendar;
         }
         catch (error) {
-            return [];
+            console.error('Error updating calendar:', error);
+            return null;
         }
     }
 
