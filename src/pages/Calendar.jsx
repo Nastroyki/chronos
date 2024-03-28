@@ -101,15 +101,13 @@ const Calendar = () => {
     }
 
     const renderDots = async (calendarData) => {
-        let events = await getEvents(calendarData);
-        console.log(events);
-        if (!events || events.length === 0) {
-            return;
-        }
         let boxes = document.getElementsByClassName("eventsdots");
-        console.log(boxes);
         for (let i = 0; i < boxes.length; i++) {
             boxes[i].innerHTML = "";
+        }
+        let events = await getEvents(calendarData);
+        if (!events || events.length === 0) {
+            return;
         }
         // for (let i = 0; i < events.length; i++) {
         //     let day = events[i].day;
