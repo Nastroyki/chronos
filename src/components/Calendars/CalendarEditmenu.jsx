@@ -40,7 +40,6 @@ const CalendarEditMenu = ({showForm, setShowForm, getCalendarData}) => {
         try {
             await CalendarService.deleteCalendar(calendarId);
             const fCalendars = calendarsList.calendars.filter(calendar => calendar.id != calendarId);
-            console.log(fCalendars);
             if (fCalendars.length == 0) {
                 navigate(`/`);
             }

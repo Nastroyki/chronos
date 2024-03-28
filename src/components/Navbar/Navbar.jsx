@@ -24,8 +24,9 @@ const Navbar = ({ toggleSideMenu }) => {
             top: "0",
             left: "0",
             right: "0",
+            borderBottom: "1px solid #ddd",
             boxShadow: "0px 2px 8px rgba(255,255,255,0.12)",
-            p: "10px",
+            p: "3px",
           }}
           className="nav_bar">
             {user ?
