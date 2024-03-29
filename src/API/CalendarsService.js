@@ -44,7 +44,6 @@ export default class CalendarsService {
             return calendar;
         }
         catch (error) {
-            console.log(error.response.data);
             return error.response.data;
         }
     }
@@ -113,6 +112,69 @@ export default class CalendarsService {
             });
             const calendar = response.data.data;
             return calendar;
+        }
+        catch (error) {
+            return [];
+        }
+    }
+
+    static async getCalendarUsers(id) {
+        try {
+            const response = await axios.get(`http://localhost:3001/api/calendars/${id}/users`, {
+                headers: {
+                    'Authorization': `Bearer ${getUserFromLocalStorage().token}`
+                }
+            });
+            const calendar = response.data.data.users;
+            return calendar;
+        }
+        catch (error) {
+            return [];
+        }
+    }
+
+    static async changeUserAccess(id, data) {
+        try {
+            const response = await axios.patch(`http://localhost:3001/api/calendars/${id}/users`, data, {
+                headers: {
+                    'Authorization': `Bearer ${getUserFromLocalStorage().token}`
+                }
+            });
+            const calendar = response.data.data;
+            return calendar;
+        }
+        catch (error) {
+            return [];
+        }
+    }
+
+    static async getUserByName(login) {
+        try {
+            const response = await axios.get(`http://localhost:3001/api/users/`, {
+                params: {
+                    login: login
+                },
+                headers: {
+                    'Authorization': `Bearer ${getUserFromLocalStorage().token}`
+                }
+            });
+            const users = response.data.data;
+            return users;
+        }
+        catch (error) {
+            return [];
+        }
+    }
+
+    static async addUserToCalindar(id, user_id) {
+        try {
+            const response = await axios.post(`http://localhost:3001/api/calendars/${id}/users`, {user_id: user_id, access: "read"}, {
+                headers: {
+                    'Authorization': `Bearer ${getUserFromLocalStorage().token}`
+                }
+            });
+            const users = response.data.data;
+            return users;
         }
         catch (error) {
             return [];

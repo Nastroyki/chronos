@@ -51,14 +51,15 @@ const Calendar = () => {
         const day_ = String(day.getDate()).padStart(2, '0');
         CalendarService.getcalendarData(id, `${year}-${month}-${day_}`, showType).then(async (res) => {
             setCalendarData(res);
-            console.log(res);
             renderDots(res);
         });
     }
 
     useEffect(() => {
-        getCalendarData();
-        setCalendarId(id);
+        if (id != 0) {
+            getCalendarData();
+            setCalendarId(id);
+        }
     }, [day, id, showType])
 
 
@@ -81,7 +82,6 @@ const Calendar = () => {
     const [events, setEvents] = useState([]);
 
     const getEvents = async (calendarData) => {
-        console.log(calendarData);
         if (!calendarData.Events) {
             return;
         }
@@ -109,34 +109,6 @@ const Calendar = () => {
         if (!events || events.length === 0) {
             return;
         }
-        // for (let i = 0; i < events.length; i++) {
-        //     let day = events[i].day;
-        //     let eventCategory = events[i].eventCategory;
-        //     for (let j = 0; j < boxes.length; j++) {
-        //         if (boxes[j].parentElement.innerHTML.split('<')[0] == dayjs(day).date()) {
-        //             let dot = document.createElement("div");
-        //             dot.className = "eventdot";
-        //             switch (eventCategory) {
-        //                 case "arrangement":
-        //                     dot.style.backgroundColor = arrangementColor;
-        //                     break;
-        //                 case "reminder":
-        //                     dot.style.backgroundColor = reminderColor;
-        //                     break;
-        //                 case "task":
-        //                     dot.style.backgroundColor = taskColor;
-        //                     break;
-        //                 case "holiday":
-        //                     dot.style.backgroundColor = holidayColor;
-        //                     break;
-        //                 default:
-        //                     dot.style.backgroundColor = otherColor;
-        //             }
-        //             console.log("dot");
-        //             boxes[j].appendChild(dot);
-        //         }
-        //     }
-        // }
         for (let i = 0; i < boxes.length; i++) {
             let day = boxes[i].parentElement.innerHTML.split('<')[0];
             for (let j = 0; j < events.length; j++) {

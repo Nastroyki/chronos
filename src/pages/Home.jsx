@@ -13,10 +13,9 @@ const Home = () => {
         const fetchData = async () => {
             const user = getUserFromLocalStorage();
             if (user) {
-                console.log(user);
                 const calendars = await CalendarService.getAllCalendars();
                 setCalendarsList(calendars);
-                if (calendars.calendars.length !== 0) {
+                if (calendars.calendars && calendars.calendars.length !== 0) {
                     navigate(`/calendars/${calendars.calendars[0].id}`);
                     return;
                 }

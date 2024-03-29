@@ -74,6 +74,21 @@ const AddCalendar = () => {
                         }}
                         onSubmit={(e) => handleSubmit(e)}>
                         <TextField
+                            sx={{
+                                "& .MuiInputLabel-root": {
+                                    marginTop: "-0px",
+                                    "&:not([data-shrink='true'])": {
+                                        marginTop: "-7px"
+                                    }
+                                },
+                                "& .MuiInputBase-root": {
+                                    minHeight: "36.5px",
+                                    maxHeight: "36.5px",
+                                    "& .MuiInputBase-input": {
+                                        marginTop: "4px"
+                                    }
+                                }
+                            }}
                             value={name}
                             onChange={(e) => {
                                 setName(e.target.value);

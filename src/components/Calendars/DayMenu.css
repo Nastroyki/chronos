@@ -62,6 +62,7 @@
     border-radius: 5px;
     margin: 3px;
     height: calc(100% - 3px);
+    cursor: pointer;
 }
 
 .typecircle {

@@ -15,10 +15,22 @@ import { Calendar } from '../models/Calendar.js';
 import { User_Calendar } from '../models/User_Calendar.js';
 
 router.get('/', async (req, res) => {
+    const userId = await getUserFromRequest(req);
+    const users = getAuthUsers();
+    const user = await User.findByPk(users[userId]);
 
 
-    const users = await User.findAll();
-    const simplifiedUsers = users.map(user => ({ id: user.id, login: user.login }));
+    const findedUsers = await User.findAll({
+        where: {
+            login: {
+                [Op.like]: `%${req.query.login}%` // Используем оператор LIKE для поиска части username
+            }
+        }
+    });
+
+
+    const simplifiedUsers = findedUsers.map(user => ({ id: user.id, login: user.login }));
+    console.log(simplifiedUsers);
     return res.status(200).json(generateResponse('Users data', {data: simplifiedUsers}));
 });
 

@@ -63,3 +63,28 @@
     margin: 3px;
     height: calc(100% - 3px);
 }
+
+
+.users-info {
+    margin-top: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.users-list {
+    overflow-y: scroll;
+    scrollbar-color: gray #282828;
+    scrollbar-width: thin;
+    max-height: 300px;
+}
+
+.find-user {
+    margin-top: 15px;
+    display:flex;
+    justify-content: space-between;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}

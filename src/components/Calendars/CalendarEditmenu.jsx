@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Paper, Typography, Container, Box, Fab, Alert, ButtonBase, TextField, Button, Checkbox, FormControlLabel } from "@mui/material";
+import { Paper, Typography, Autocomplete, MenuItem, Container, Box, Fab, Alert, ButtonBase, TextField, Button, Checkbox, FormControlLabel } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -17,13 +17,54 @@ const CalendarEditMenu = ({showForm, setShowForm, getCalendarData}) => {
     const [calendarName_, setCalendarName] = useState("");
     const [public_, setPublic] = useState(false);
     const [error, setError] = useState();
+    const [users, setUsers] = useState([]);
+    
+    const [usersLogins, setUsersLogins] = useState([]);
+    const [findedUsersList, setFindedUsersList] = useState([]);
+    const [targetUser, setTargetUser] = useState("");
     const { calendarId } = useContextProvider();
     const navigate = useNavigate();
 
     useEffect(() => {
-        setCalendarName(calendarData.calendarName);
-        setPublic(!calendarData.public);
+        if (showForm) {
+            setCalendarName(calendarData.calendarName);
+            setPublic(!calendarData.public);
+            CalendarService.getCalendarUsers(calendarId).then((users_) => {
+                setUsers(users_);
+            });
+        }
     }, [showForm, calendarData]);
+
+    const onAccesChangeClicked = async (user_id, access) => {
+        const new_access = access == "write" ? "read" : "write";
+        await CalendarService.changeUserAccess(calendarId, {user_id: user_id, access: new_access});
+        CalendarService.getCalendarUsers(calendarId).then((users_) => {
+            setUsers(users_);
+        });
+    }
+
+    const handleSelectOption = async (event, value) => {
+        setTargetUser(value);
+    }
+
+    const handleSearch = async (value) => {
+        if (value.length >= 4) {
+            CalendarService.getUserByName(value).then((users_) => {
+                setFindedUsersList(users_);
+                setUsersLogins(users_.map(user => user.login));
+            });
+        }
+    }
+
+    const onAddUserClicked = async () => {
+        if (findedUsersList.length != 0) {
+            const targetUserId = findedUsersList.find(user => user.login == targetUser).id;
+            await CalendarService.addUserToCalindar(calendarId, targetUserId);
+            CalendarService.getCalendarUsers(calendarId).then((users_) => {
+                setUsers(users_);
+            });
+        }
+    }
 
     const handleSubmit = async () => {
         try {
@@ -60,10 +101,11 @@ const CalendarEditMenu = ({showForm, setShowForm, getCalendarData}) => {
                 maxWidth="sm"
                 sx={{
                     position: 'fixed',
+                    width: "550px",
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    display: showForm ? 'block' : 'none'  // Conditional display
+                    display: showForm ? 'block' : 'none'
                 }}
             >
                 {showForm && (<Paper elevation={4} sx={{ p: 4, mt: 15 }} style={{ textAlign: "center" }}>
@@ -81,7 +123,22 @@ const CalendarEditMenu = ({showForm, setShowForm, getCalendarData}) => {
                         }}
                         onSubmit={(e) => {handleSubmit(e)}}>
 
-                        <TextField
+                        <TextField 
+                            sx={{
+                                "& .MuiInputLabel-root": {
+                                    marginTop: "-0px",
+                                    "&:not([data-shrink='true'])": {
+                                        marginTop: "-7px"
+                                    }
+                                },
+                                "& .MuiInputBase-root": {
+                                    minHeight: "36.5px",
+                                    maxHeight: "36.5px",
+                                    "& .MuiInputBase-input": {
+                                        marginTop: "4px"
+                                    }
+                                }
+                            }}
                             value={calendarName_}
                             onChange={(e) => {
                                 setCalendarName(e.target.value);
@@ -104,10 +161,48 @@ const CalendarEditMenu = ({showForm, setShowForm, getCalendarData}) => {
                                 Delete
                             </Button>
                             <Fab color="error" aria-label="edit" sx={{ position: 'absolute', top: 26, right: 26, height: 44, width: 44, mt: 15, mr: 2 }} onClick={() => {setShowForm(false)}}>
-                                    <CloseIcon />
+                                <CloseIcon />
                             </Fab>
                         </div>
                     </form>
+                    <div className="users-info">
+                        <div className="find-user">
+                            <Autocomplete sx={{width: "285%", 
+                                "& .MuiInputLabel-root": {
+                                    marginTop: "-0px",
+                                    "&:not([data-shrink='true'])": {
+                                        marginTop: "-7px"
+                                    }
+                                },
+                                "& .MuiAutocomplete-inputRoot": { minHeight: "36.5px", width: "98%" ,
+                                    "& .MuiAutocomplete-input": { paddingTop: "0px"}
+                                }
+                            }}
+                                options={usersLogins} 
+                                onChange={handleSelectOption}
+                                autoSelect={false}
+                                onInputChange={(event, value) => handleSearch(value)}
+                                renderInput={(params) => <TextField sx={{height: "10px"}} {...params} label="Add User" />}
+                            />
+                            <Button sx={{width: "5%"}} variant="contained" color="success" onClick={() => {onAddUserClicked()}} style={{width: "49%"}}>
+                                Add
+                            </Button>
+                        </div>
+                        <Typography variant="h6" color='textPrimary' style={{ textDecoration: 'none', padding: 1, marginTop: 5, marginBottom: 5, width: "100%", marginLeft: 10 }}>User List:</Typography>
+                        <div className="users-list">
+                            {((users) && (users.length)) && (
+                                users.map((user) => (
+                                    <div key={`${user.id}`} className="user-info">
+                                        <Typography variant="h6" color='textPrimary' style={{ textDecoration: 'none' }}>{user.login}</Typography>
+                                        {user.id != calendarData.author_id ? 
+                                        (<Typography variant="h6" color='textPrimary' style={{ textDecoration: 'none', cursor: "pointer" }} onClick={() => {onAccesChangeClicked(user.id, user.access)}}>{user.access}</Typography>) 
+                                        : 
+                                        (<Typography variant="h6" color='textPrimary' style={{ textDecoration: 'none', cursor: "default" }}>author</Typography>)}
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
                 </Paper>)}
             </Container>
         </div>

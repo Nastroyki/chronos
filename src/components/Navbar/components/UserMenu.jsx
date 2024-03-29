@@ -7,7 +7,6 @@ import { getUserFromLocalStorage } from "../../../store/store";
 
 const UserMenu = () => {
     const user = getUserFromLocalStorage();
-    console.log(user);
 
     const handleClick_log_out = async () => {
         await AuthService.logout().then(() => {

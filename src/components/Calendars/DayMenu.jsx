@@ -358,11 +358,24 @@ const DayMenu = (props) => {
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
+                    width: menuEvents ? "912px" : "550px",
                     display: props.showForm ? 'block' : 'none'  // Conditional display
                 }}
 
             >
-                <Paper elevation={4} sx={{ p: 4, pl: menuEvents ? 0 : 4, mt: 10 }} style={{ textAlign: "center" }} className={"eventPaper"}>
+                <Paper 
+                    elevation={4} sx={
+                        { 
+                            p: 4, 
+                            pb: menuEvents ? 2 : 4, 
+                            pl: menuEvents ? 0 : 4, 
+                            mt: 10, 
+                            height: menuEvents ? "auto" : "480px", 
+                        }
+                    }
+                    style={{ textAlign: "center" }} 
+                    className={"eventPaper"}
+                >
                     <Typography variant="h4" marginLeft={menuEvents ? "32px" : "0px"}>{dayjs(props.chosenDate).format('MMMM D')}</Typography>
                     <div className="eventscontainer"
                         style={{
@@ -380,7 +393,7 @@ const DayMenu = (props) => {
                             style={{
                                 display: "flex",
                                 flexDirection: "column",
-                                gap: "10px",
+                                gap: "15px",
                                 width: "100%",
                                 justify: "center",
                                 marginTop: "40px",
@@ -388,6 +401,21 @@ const DayMenu = (props) => {
                             onSubmit={(e) => handleSubmit(e)}>
 
                             <TextField
+                                sx={{
+                                    "& .MuiInputLabel-root": {
+                                        marginTop: "-0px",
+                                        "&:not([data-shrink='true'])": {
+                                            marginTop: "-7px"
+                                        }
+                                    },
+                                    "& .MuiInputBase-root": {
+                                        minHeight: "36.5px",
+                                        maxHeight: "36.5px",
+                                        "& .MuiInputBase-input": {
+                                            marginTop: "4px"
+                                        }
+                                    }
+                                }}
                                 label="Event Name"
                                 variant="outlined"
                                 required
@@ -395,6 +423,21 @@ const DayMenu = (props) => {
                                 onChange={(e) => setEventName(e.target.value)}
                             />
                             <TextField
+                                sx={{
+                                    "& .MuiInputLabel-root": {
+                                        marginTop: "-0px",
+                                        "&:not([data-shrink='true'])": {
+                                            marginTop: "-7px"
+                                        }
+                                    },
+                                    "& .MuiInputBase-root": {
+                                        minHeight: "36.5px",
+                                        maxHeight: "36.5px",
+                                        "& .MuiInputBase-input": {
+                                            marginTop: "4px"
+                                        }
+                                    }
+                                }}
                                 label="Event Description"
                                 variant="outlined"
                                 required
@@ -402,6 +445,21 @@ const DayMenu = (props) => {
                                 onChange={(e) => setEventDescription(e.target.value)}
                             />
                             <TimePicker
+                                sx={{
+                                    "& .MuiInputLabel-root": {
+                                        marginTop: "-0px",
+                                        "&:not([data-shrink='true'])": {
+                                            marginTop: "-7px"
+                                        }
+                                    },
+                                    "& .MuiInputBase-root": {
+                                        minHeight: "36.5px",
+                                        maxHeight: "36.5px",
+                                        "& .MuiInputBase-input": {
+                                            marginTop: "4px"
+                                        }
+                                    }
+                                }}
                                 label="Start Time"
                                 format="HH:mm"
                                 ampm={false}
@@ -410,6 +468,21 @@ const DayMenu = (props) => {
                                 onChange={(e) => setEventStartTime(e)}
                             />
                             <TimePicker
+                                sx={{
+                                    "& .MuiInputLabel-root": {
+                                        marginTop: "-0px",
+                                        "&:not([data-shrink='true'])": {
+                                            marginTop: "-7px"
+                                        }
+                                    },
+                                    "& .MuiInputBase-root": {
+                                        minHeight: "36.5px",
+                                        maxHeight: "36.5px",
+                                        "& .MuiInputBase-input": {
+                                            marginTop: "4px"
+                                        }
+                                    }
+                                }}
                                 label="End Time"
                                 format="HH:mm"
                                 ampm={false}
@@ -421,7 +494,11 @@ const DayMenu = (props) => {
                             <Select
                                 labelId="demo-simple-select-label"
                                 sx={{
-                                    textAlign: "left"
+                                    textAlign: "left",
+                                    "& .MuiSelect-select": {
+                                        paddingTop: "7px",
+                                        paddingBottom: "10px"
+                                    }
                                 }}
                                 value={eventType}
                                 id="demo-simple-select"
